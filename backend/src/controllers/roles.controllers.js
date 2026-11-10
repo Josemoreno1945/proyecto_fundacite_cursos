@@ -18,6 +18,7 @@ import {
 import roles_schemas from "../schemas/roles.schemas.js";
 import roles_put_schemas from "../schemas/roles_put.schemas.js";
 import { errors, throwError } from "../utils/errors.js";
+import { send_success, success_messages } from "../utils/success.js";
 
 //---------------------------------Filtro------------------------------------
 export const c_filtrar_nombre_rol = async (req, res, next) => {
@@ -113,7 +114,7 @@ export const c_post_rol = async (req, res, next) => {
     };
 
     const rows = await post_rol(datos_para_guardar);
-    return res.json({ rows, message: "Rol registrado con exito" });
+    return send_success(res, success_messages.rol_creado);
   } catch (error) {
     next(error);
   }
@@ -151,7 +152,7 @@ export const c_put_rol = async (req, res, next) => {
     if (!rows) {
       throwError(errors.rol_no_encontrado);
     }
-    return res.json({ rows, message: "Rol actualizado con éxito" });
+    return send_success(res, success_messages.rol_actualizado);
   } catch (error) {
     next(error);
   }
@@ -176,7 +177,7 @@ export const c_desactivar_rol = async (req, res, next) => {
     
 
     await desactivar_rol(id);
-    return res.json({ message: "Rol desactivado" });
+    return send_success(res, success_messages.rol_desactivado);
   } catch (error) {
     next(error);
   }
@@ -193,7 +194,7 @@ export const c_activar_rol = async (req, res, next) => {
     }
 
     await activar_rol(id);
-    return res.json({ message: "Rol activado" });
+    return send_success(res, success_messages.rol_activado);
   } catch (error) {
     next(error);
   }
@@ -235,8 +236,8 @@ export const c_asignar_permiso_a_rol = async (req, res, next) => {
       throwError(errors.permiso_ya_asignado);
     }
 
-    const rows = await asignar_permiso_a_rol(id, permiso_id);
-    return res.json({ rows, message: "Permiso asignado al rol con exito" });
+    await asignar_permiso_a_rol(id, permiso_id);
+    return send_success(res, success_messages.permiso_asignado);
   } catch (error) {
     next(error);
   }
@@ -255,7 +256,7 @@ export const c_quitar_permiso_de_rol = async (req, res, next) => {
     if (!rows) {
       throwError(errors.permiso_no_asignado)
     }
-    return res.json({ message: "Permiso removido del rol con exito" });
+    return send_success(res, success_messages.permiso_removido);
   } catch (error) {
     next(error);
   }

@@ -33,6 +33,42 @@ export const errors = {
   },
   
 
+  // Profesiones
+  profesion_no_encontrada: {
+    status: 404,
+    message: "Profesión no encontrada",
+  },
+  profesion_duplicada: {
+    status: 409,
+    message: "La profesión ya está registrada",
+  },
+
+  // Geografía
+  estado_no_encontrado: {
+    status: 404,
+    message: "Estado no encontrado",
+  },
+  estado_duplicado: {
+    status: 409,
+    message: "El estado ya está registrado",
+  },
+  municipio_no_encontrado: {
+    status: 404,
+    message: "Municipio no encontrado",
+  },
+  municipio_duplicado: {
+    status: 409,
+    message: "El municipio ya está registrado en ese estado",
+  },
+  parroquia_no_encontrada: {
+    status: 404,
+    message: "Parroquia no encontrada",
+  },
+  parroquia_duplicada: {
+    status: 409,
+    message: "La parroquia ya está registrada en ese municipio",
+  },
+
   // Roles y permisos
   rol_no_encontrado: {
     status: 404,

@@ -1,4 +1,6 @@
 
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
 -- ============================================================
 --  TIPOS (ENUMS)
 -- ============================================================
@@ -151,33 +153,33 @@ CREATE TYPE "grado_escolar" AS ENUM (
 -- ============================================================
 
 CREATE TABLE "roles" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "nombre" nombre_rol UNIQUE NOT NULL,
   "descripcion" text,
   "estado" estado NOT NULL DEFAULT 'activo'
 );
 
 CREATE TABLE "permisos" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "nombre" varchar(100) UNIQUE NOT NULL,
   "descripcion" text
 );
 
 CREATE TABLE "rol_permisos" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "rol_id" uuid NOT NULL,
   "permiso_id" uuid NOT NULL
 );
 
 CREATE TABLE "profesiones" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "nombre" varchar(100) UNIQUE NOT NULL,
   "creado_en" timestamp NOT NULL DEFAULT (now()),
   "actualizado_en" timestamp
 );
 
 CREATE TABLE "usuarios" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "rol_id" uuid NOT NULL,
   "profesion_id" uuid,
   "institucion_id" uuid,                -- Solo aplica para representante_institucional y facilitador (su sede)
@@ -197,7 +199,7 @@ CREATE TABLE "usuarios" (
 );
 
 CREATE TABLE "menores" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "representante_id" uuid NOT NULL,     -- Usuario (padre o coordinador escolar) que registró al menor
   "institucion_id" uuid,                -- Escuela/institución a la que pertenece el menor
   "cedula" varchar(20),
@@ -212,14 +214,14 @@ CREATE TABLE "menores" (
 );
 
 CREATE TABLE "estados" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "nombre" varchar(100) NOT NULL,
   "creado_en" timestamp NOT NULL DEFAULT (now()),
   "actualizado_en" timestamp
 );
 
 CREATE TABLE "municipios" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "estado_id" uuid NOT NULL,
   "nombre" varchar(100) NOT NULL,
   "creado_en" timestamp NOT NULL DEFAULT (now()),
@@ -227,7 +229,7 @@ CREATE TABLE "municipios" (
 );
 
 CREATE TABLE "parroquias" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "municipio_id" uuid NOT NULL,
   "nombre" varchar(100) NOT NULL,
   "creado_en" timestamp NOT NULL DEFAULT (now()),
@@ -235,7 +237,7 @@ CREATE TABLE "parroquias" (
 );
 
 CREATE TABLE "instituciones" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "nombre" varchar(150) NOT NULL,
   "direccion" text,
   "parroquia_id" uuid NOT NULL,
@@ -247,7 +249,7 @@ CREATE TABLE "instituciones" (
 
 
 CREATE TABLE "talleres" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "nombre" varchar(150) NOT NULL,
   "descripcion" text,
   "area" area_taller NOT NULL DEFAULT 'otro',
@@ -264,7 +266,7 @@ CREATE TABLE "talleres" (
 
 
 CREATE TABLE "clases" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "taller_id" uuid NOT NULL,
   "numero_clase" int NOT NULL,
   "titulo" varchar(200) NOT NULL,
@@ -287,7 +289,7 @@ CREATE TABLE "clases" (
 --  no hay que cambiar nada en la estructura.
 -- ------------------------------------------------------------
 CREATE TABLE "clase_facilitadores" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "clase_id" uuid NOT NULL,
   "facilitador_id" uuid NOT NULL,       -- Usuario con rol facilitador o administrador
   "asignado_en" timestamp NOT NULL DEFAULT (now())
@@ -295,7 +297,7 @@ CREATE TABLE "clase_facilitadores" (
 
 
 CREATE TABLE "inscripciones" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "taller_id" uuid NOT NULL,
   "usuario_id" uuid,                    -- Participante adulto (NULL si es menor)
   "menor_id" uuid,                      -- Participante menor  (NULL si es adulto)
@@ -316,7 +318,7 @@ CREATE TABLE "inscripciones" (
 --  El participante puede consultar su historial desde su perfil.
 -- ------------------------------------------------------------
 CREATE TABLE "asistencias" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "inscripcion_id" uuid NOT NULL,
   "clase_id" uuid NOT NULL,
   "asistio" asistencia NOT NULL,
@@ -328,7 +330,7 @@ CREATE TABLE "asistencias" (
 --  NOTIFICACIONES
 -- ------------------------------------------------------------
 CREATE TABLE "notificaciones" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "usuario_id" uuid NOT NULL,
   "taller_id" uuid NOT NULL,
   "tipo" tipo_notificacion NOT NULL,
@@ -343,7 +345,7 @@ CREATE TABLE "notificaciones" (
 --  RECUPERACIÓN DE CONTRASEÑA
 -- ------------------------------------------------------------
 CREATE TABLE "recuperaciones_contrasena" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "usuario_id" uuid NOT NULL,
   "token" varchar(255) UNIQUE NOT NULL, -- UUID aleatorio o OTP 6 dígitos
   "tipo" tipo_recuperacion NOT NULL,
@@ -356,7 +358,7 @@ CREATE TABLE "recuperaciones_contrasena" (
 --  AUDITORÍA
 -- ------------------------------------------------------------
 CREATE TABLE "auditoria" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "usuario_id" uuid,
   "accion" accion_auditoria NOT NULL,
   "modulo" varchar(50) NOT NULL,
@@ -372,7 +374,7 @@ CREATE TABLE "auditoria" (
 -- ------------------------------------------------------------
 
 CREATE TABLE "certificados" (
-  "id" uuid PRIMARY KEY,
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "inscripcion_id" uuid UNIQUE NOT NULL,
   "codigo_verificacion" varchar(50) UNIQUE NOT NULL,
   "fecha_emision" timestamp NOT NULL DEFAULT (now()),

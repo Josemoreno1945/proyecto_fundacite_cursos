@@ -25,6 +25,7 @@ import usuario_put_schemas from "../schemas/usuarios_put.schemas.js"
 import nodemailer from "nodemailer";
 
 import { errors, throwError } from "../utils/errors.js";
+import { send_success, success_messages } from "../utils/success.js";
 
 //---------------------------------Filtro------------------------------------
 export const c_filtrar_nombre_usuario = async (req, res, next) => {
@@ -137,7 +138,9 @@ export const c_get_correo = async (req, res, next) => {
   try {
     const correo = req.params.correo
     const rows = await get_usuario_por_correo(correo);
-    return res.json({ exists: !!rows });
+    if (!rows) {
+      throwError(errors.usuario_no_encontrado);
+    }
   } catch (error) {
     next(error);
   }
@@ -147,7 +150,9 @@ export const c_get_usuario_por_nombreusuario = async (req, res, next) => {
   try {
     const nombre_usuario = req.params.nombre_usuario;
     const rows = await get_usuario_por_nombreusuario(nombre_usuario);
-    return res.json({ exists: !!rows });
+    if (!rows) {
+      throwError(errors.usuario_no_encontrado);
+    }
   } catch (error) {
     next(error);
   }
@@ -186,7 +191,7 @@ export const c_post_usuario = async (req, res, next) => {
     };
     const row = await post_usuario(datos_para_guardar);
     delete row.contrasena;
-    return res.json({usuario:row, message: "Usuario registrado con exito" });
+    return send_success(res, success_messages.usuario_creado);
   } catch (error) {
     next(error);
   }
@@ -235,7 +240,7 @@ export const c_put_usuarios = async (req, res, next) => {
       throwError(errors.usuario_no_encontrado)
     }
     delete rows.contrasena;
-    return res.json({ rows, message: "Usuario actualizado con éxito" });
+    return send_success(res, success_messages.usuario_actualizado);
   } catch (error) {
     next(error);
   }
@@ -257,7 +262,7 @@ export const c_desactivar_usuarios = async (req, res, next) => {
     }
 
     await desactivar_usuario(id);
-    return res.json({ message: "usuario desactivado" });
+    return send_success(res, success_messages.usuario_desactivado);
 
   } catch (error) {
     next(error);
@@ -275,7 +280,7 @@ export const c_activar_usuarios = async (req, res, next) => {
     }
 
     await activar_usuario(id);
-    return res.json({ message: "usuario activado" });
+    return send_success(res, success_messages.usuario_activado);
 
   } catch (error) {
     next(error);
@@ -397,7 +402,7 @@ export const registro = async (req, res, next) => {
 
     const rows = await post_usuario(datos_para_guardar);
     delete rows.contrasena;
-    return res.json({ rows, message: "Usuario registrado con exito" });
+    return send_success(res, success_messages.usuario_creado);
   } catch (error) {
     next(error);
   }
@@ -465,10 +470,7 @@ export const olvido_contrasena = async (req, res, next) => {
 
     // Envío del correo
     await transporter.sendMail(mailOptions);
-
-    return res.json({
-      message: "Correo enviado con éxito",
-    });
+    return send_success(res, success_messages.correo_recuperacion_enviado);
   } catch (error) {
     next(error);
   }
@@ -510,7 +512,7 @@ export const cambiar_contrasena = async (req, res, next) => {
       throwError(errors.usuario_no_encontrado);
     }
 
-    return res.json({ message: "Contraseña actualizada correctamente" });
+    return send_success(res, success_messages.contrasena_actualizada);
   } catch (error) {
     next(error);
   }

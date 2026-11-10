@@ -191,19 +191,36 @@ export const post_usuario = async (data) => {
 //--------------------------------Put----------------------------------------
 
 export const put_usuario = async (id, data) => {
+
+    const columnas_permitidas = [
+    "rol_id",
+    "profesion_id",
+    "institucion_id",
+    "nombre_usuario",
+    "cedula",
+    "primer_nombre",
+    "primer_apellido",
+    "sexo",
+    "nivel_instruccion",
+    "correo",
+    "telefono",
+    "estado",
+  ];
+
   const fields = [];
   const values = [];
   let index = 1;
 
-  for (const [key, value] of Object.entries(data)) {
-    fields.push(`${key} = $${index}`);
-    values.push(value);
-    index++;
+    for (const [key, value] of Object.entries(data)) {
+    if (columnas_permitidas.includes(key)) {
+      fields.push(`${key} = $${index}`);
+      values.push(value);
+      index++;
+    }
   }
   if (fields.length === 0) return null;
   
   fields.push(`actualizado_en = NOW()`);
-
   values.push(id);  
  
   const query = `
