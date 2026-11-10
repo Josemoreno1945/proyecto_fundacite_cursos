@@ -30,11 +30,11 @@ import { errors, throwError } from "../utils/errors.js";
 export const c_filtrar_nombre_usuario = async (req, res, next) => {
   try {
     const { nombre_usuario } = req.query;
+
     if (!nombre_usuario) {
-      return res.status(400).json({ 
-        error: "El parámetro 'nombre_usuario' es obligatorio para realizar la búsqueda." 
-      });
+      throwError(errors.campos_faltantes)
     }
+
     const rows = await filtro_nombre_usuario(nombre_usuario);
     res.json(rows);
   } catch (error) {
@@ -46,9 +46,7 @@ export const c_filtrar_correo = async (req, res, next) => {
   try {
     const {correo} = req.query;
     if (!correo) {
-      return res.status(400).json({ 
-        error: "El parámetro 'correo' es obligatorio para realizar la búsqueda." 
-      });
+      throwError(errors.campos_faltantes)
     }
     const rows = await filtro_correo(correo);
     res.json(rows);
@@ -61,9 +59,7 @@ export const c_filtrar_rol = async (req, res, next) => {
   try {
     const {nombre} = req.query;
     if (!nombre) {
-      return res.status(400).json({ 
-        error: "El parámetro 'nombre' es obligatorio para realizar la búsqueda." 
-      });
+      throwError(errors.campos_faltantes)
     }
     const rows = await filtro_rol(nombre);
     res.json(rows);
@@ -87,6 +83,9 @@ export const c_get_usuarios_id = async (req, res, next) => {
   try {
     const id = req.params.id;
     const rows = await get_usuario_id(id);
+    if (!rows) {
+      throwError(errors.usuario_no_encontrado);
+    }
     res.json(rows);
   } catch (error) {
     next(error);
@@ -125,6 +124,9 @@ export const c_get_usuario_ver = async (req, res, next) => {
   try {
     const id = req.params.id;
     const rows = await get_usuario_id(id);
+    if (!rows) {
+      throwError(errors.usuario_no_encontrado);
+    }
     res.json(rows);
   } catch (error) {
     next(error);
@@ -230,7 +232,7 @@ export const c_put_usuarios = async (req, res, next) => {
     delete datos_a_actualizar.contrasena;
     const rows = await put_usuario(id, datos_a_actualizar);
     if (!rows) {
-      return res.status(404).json({ message: "Usuario no encontrado" });
+      throwError(errors.usuario_no_encontrado)
     }
     delete rows.contrasena;
     return res.json({ rows, message: "Usuario actualizado con éxito" });
@@ -247,13 +249,11 @@ export const c_desactivar_usuarios = async (req, res, next) => {
     const usuario_a_desactivar = await get_usuario_id(id);
 
     if (!usuario_a_desactivar) {
-      return res.status(404).json({ message: "Usuario no encontrado" });
+      throwError(errors.usuario_no_encontrado)
     }
 
     if (usuario_a_desactivar?.usuario_protegido) {
-      return res
-        .status(403)
-        .json({ message: "No puedes eliminar este usuario." });
+      throwError(errors.usuario_protegido)
     }
 
     await desactivar_usuario(id);
@@ -271,7 +271,7 @@ export const c_activar_usuarios = async (req, res, next) => {
     const usuario_a_activar = await get_usuario_id(id);
 
     if (!usuario_a_activar) {
-      return res.status(404).json({ message: "Usuario no encontrado" });
+      throwError(errors.usuario_no_encontrado)
     }
 
     await activar_usuario(id);
@@ -313,12 +313,15 @@ export const login = async (req, res, next) => {
     }
 
     if (usuario.estado !== 'activo') {
-      return res.status(403).json({ error: "Tu cuenta se encuentra inactiva. Contacta al administrador." });
+      throwError(errors.cuenta_inactiva)
     }
 
     // 4. Generar el token
     const token = jwt.sign(
-      { id: usuario.id, username: usuario.nombre_usuario, rol: usuario.rol },
+      { id: usuario.id, 
+        username: usuario.nombre_usuario, 
+        rol: usuario.rol 
+      },
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
     );
@@ -359,9 +362,7 @@ export const registro = async (req, res, next) => {
     const rol_valido = roles_permitidos.some((rol) => rol.id === data.rol_id);
 
     if (!rol_valido) {
-      return res.status(400).json({
-        message: "El rol seleccionado no está permitido para el registro",
-      });
+      throwError(errors.rol_no_selecionable)
     }
 
 

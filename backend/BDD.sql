@@ -154,7 +154,7 @@ CREATE TABLE "roles" (
   "id" uuid PRIMARY KEY,
   "nombre" nombre_rol UNIQUE NOT NULL,
   "descripcion" text,
-  "activo" estado NOT NULL DEFAULT 'activo'
+  "estado" estado NOT NULL DEFAULT 'activo'
 );
 
 CREATE TABLE "permisos" (

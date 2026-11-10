@@ -5,6 +5,7 @@ export function throwError(errorObj) {
 }
 
 export const errors = {
+
   // Usuarios
   usuario_no_encontrado: {
     status: 404,
@@ -22,6 +23,46 @@ export const errors = {
     status: 409,
     message: "El email ya está registrado",
   },
+  usuario_protegido:{
+    status:403,
+    message:"No puedes eliminar este usuario",
+  },
+  cuenta_inactiva:{
+    status:403,
+    message:"Tu cuenta se encuentra inactiva. Contacta al administrador",
+  },
+  
+
+  // Roles y permisos
+  rol_no_encontrado: {
+    status: 404,
+    message: "Rol no encontrado",
+  },
+  rol_duplicado: {
+    status: 409,
+    message: "El rol ya está registrado",
+  },
+  permiso_no_encontrado: {
+    status: 404,
+    message: "Permiso no encontrado",
+  },
+  permiso_ya_asignado: {
+    status: 409,
+    message: "El permiso ya está asignado a este rol",
+  },
+  rol_protegido:{
+    status:403,
+    message:'No puedes desactivar este rol principal',
+  },
+  rol_no_selecionable:{
+    status:400,
+    message:'El rol seleccionado no está permitido para el registro',
+  },
+  
+  permiso_no_asignado:{
+    status:404,
+    message:'El permiso no estaba asignado a este rol'
+  }, 
 
   // Login
   contrasena_invalida: {
