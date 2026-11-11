@@ -68,7 +68,7 @@ export const c_post_profesion = async (req, res, next) => {
     }
     //--------------------------------------------------------------
 
-    const rows = await post_profesion(parseP.data);
+    await post_profesion(parseP.data);
     return send_success(res, success_messages.profesion_creada);
   } catch (error) {
     next(error);

@@ -55,12 +55,12 @@ export const c_post_estado = async (req, res, next) => {
     const data = req.body;
 
     const parseE = estado_schemas.safeParse(data);
+
     if (!parseE.success) {
       return res.status(400).json({
         errors: parseE.error.issues,
       });
     }
-
     //-------------------------------------------------------------
     const estado_existe = await get_estado_por_nombre(data.nombre);
     if (estado_existe) {
@@ -68,7 +68,7 @@ export const c_post_estado = async (req, res, next) => {
     }
     //--------------------------------------------------------------
 
-    const rows = await post_estado(parseE.data);
+    await post_estado(parseE.data);
     return send_success(res, success_messages.estado_creado);
   } catch (error) {
     next(error);

@@ -8,8 +8,6 @@ export const get_municipios = async () => {
         m.nombre,
         e.nombre AS estado,
         m.estado_id,
-        m.creado_en,
-        m.actualizado_en
     FROM municipios m
     JOIN estados e ON e.id = m.estado_id
     ORDER BY m.nombre ASC
@@ -26,8 +24,6 @@ export const get_municipios_por_estado = async (estado_id) => {
         m.nombre,
         e.nombre AS estado,
         m.estado_id,
-        m.creado_en,
-        m.actualizado_en
     FROM municipios m
     JOIN estados e ON e.id = m.estado_id
     WHERE m.estado_id = $1
@@ -45,8 +41,6 @@ export const get_municipio_id = async (id) => {
         m.nombre,
         e.nombre AS estado,
         m.estado_id,
-        m.creado_en,
-        m.actualizado_en
     FROM municipios m
     JOIN estados e ON e.id = m.estado_id
     WHERE m.id = $1
@@ -62,7 +56,7 @@ export const get_municipio_por_nombre = async (nombre, estado_id, id = null) => 
         m.id,
         m.nombre
     FROM municipios m
-    WHERE LOWER(m.nombre) = LOWER($1)
+    WHERE unaccent(LOWER(m.nombre)) = unaccent(LOWER($1))
       AND m.estado_id = $2
       AND ($3::uuid IS NULL OR m.id != $3)
   `;
@@ -73,7 +67,9 @@ export const get_municipio_por_nombre = async (nombre, estado_id, id = null) => 
 //-------------------------------Post-----------------------------------------
 export const post_municipio = async (data) => {
   const query = `
-    INSERT INTO municipios(nombre, estado_id)
+    INSERT INTO municipios(
+    nombre, 
+    estado_id)
     VALUES ($1, $2)
     RETURNING *
   `;
@@ -121,8 +117,6 @@ export const filtro_nombre_municipio = async (nombre) => {
         m.nombre,
         e.nombre AS estado,
         m.estado_id,
-        m.creado_en,
-        m.actualizado_en
     FROM municipios m
     JOIN estados e ON e.id = m.estado_id
     WHERE unaccent(LOWER(m.nombre)) LIKE unaccent(LOWER('%' || $1 || '%'))

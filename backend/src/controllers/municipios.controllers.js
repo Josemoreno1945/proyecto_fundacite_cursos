@@ -30,7 +30,7 @@ export const c_filtrar_nombre_municipio = async (req, res, next) => {
 };
 
 //---------------------------------Get---------------------------------------
-export const c_get_municipios = async (req, res, next) => {
+export const c_get_municipios = async ( res, next) => {
   try {
     const rows = await get_municipios();
     res.json(rows);
@@ -90,7 +90,7 @@ export const c_post_municipio = async (req, res, next) => {
     }
     //--------------------------------------------------------------
 
-    const rows = await post_municipio(parseM.data);
+    await post_municipio(parseM.data);
     return send_success(res, success_messages.municipio_creado);
   } catch (error) {
     next(error);

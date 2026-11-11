@@ -5,9 +5,7 @@ export const get_profesiones = async () => {
   const query = `
     SELECT
         p.id,
-        p.nombre,
-        p.creado_en,
-        p.actualizado_en
+        p.nombre
     FROM profesiones p
     ORDER BY p.nombre ASC
   `;
@@ -21,8 +19,6 @@ export const get_profesion_id = async (id) => {
     SELECT
         p.id,
         p.nombre,
-        p.creado_en,
-        p.actualizado_en
     FROM profesiones p
     WHERE p.id = $1
   `;
@@ -37,7 +33,7 @@ export const get_profesion_por_nombre = async (nombre, id = null) => {
         p.id,
         p.nombre
     FROM profesiones p
-    WHERE LOWER(p.nombre) = LOWER($1) AND ($2::uuid IS NULL OR p.id != $2)
+    WHERE unaccent(LOWER(p.nombre)) = unaccent(LOWER($1)) AND ($2::uuid IS NULL OR p.id != $2)
   `;
   const result = await pool.query(query, [nombre, id]);
   return result.rows[0];
@@ -46,7 +42,8 @@ export const get_profesion_por_nombre = async (nombre, id = null) => {
 //-------------------------------Post-----------------------------------------
 export const post_profesion = async (data) => {
   const query = `
-    INSERT INTO profesiones(nombre)
+    INSERT INTO profesiones(
+    nombre)
     VALUES ($1)
     RETURNING *
   `;
@@ -88,8 +85,6 @@ export const filtro_nombre_profesion = async (nombre) => {
     SELECT
         p.id,
         p.nombre,
-        p.creado_en,
-        p.actualizado_en
     FROM profesiones p
     WHERE unaccent(LOWER(p.nombre)) LIKE unaccent(LOWER('%' || $1 || '%'))
     ORDER BY p.nombre ASC

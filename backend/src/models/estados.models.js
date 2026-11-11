@@ -6,8 +6,6 @@ export const get_estados = async () => {
     SELECT
         e.id,
         e.nombre,
-        e.creado_en,
-        e.actualizado_en
     FROM estados e
     ORDER BY e.nombre ASC
   `;
@@ -21,8 +19,6 @@ export const get_estado_id = async (id) => {
     SELECT
         e.id,
         e.nombre,
-        e.creado_en,
-        e.actualizado_en
     FROM estados e
     WHERE e.id = $1
   `;
@@ -37,7 +33,7 @@ export const get_estado_por_nombre = async (nombre, id = null) => {
         e.id,
         e.nombre
     FROM estados e
-    WHERE LOWER(e.nombre) = LOWER($1) AND ($2::uuid IS NULL OR e.id != $2)
+    WHERE unaccent(LOWER(e.nombre)) =unaccent((LOWER($1)) AND ($2::uuid IS NULL OR e.id != $2)
   `;
   const result = await pool.query(query, [nombre, id]);
   return result.rows[0];
@@ -46,7 +42,8 @@ export const get_estado_por_nombre = async (nombre, id = null) => {
 //-------------------------------Post-----------------------------------------
 export const post_estado = async (data) => {
   const query = `
-    INSERT INTO estados(nombre)
+    INSERT INTO estados(
+    nombre)
     VALUES ($1)
     RETURNING *
   `;
@@ -88,8 +85,6 @@ export const filtro_nombre_estado = async (nombre) => {
     SELECT
         e.id,
         e.nombre,
-        e.creado_en,
-        e.actualizado_en
     FROM estados e
     WHERE unaccent(LOWER(e.nombre)) LIKE unaccent(LOWER('%' || $1 || '%'))
     ORDER BY e.nombre ASC

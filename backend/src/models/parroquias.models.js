@@ -8,8 +8,6 @@ export const get_parroquias = async () => {
         p.nombre,
         m.nombre AS municipio,
         p.municipio_id,
-        p.creado_en,
-        p.actualizado_en
     FROM parroquias p
     JOIN municipios m ON m.id = p.municipio_id
     ORDER BY p.nombre ASC
@@ -26,8 +24,6 @@ export const get_parroquias_por_municipio = async (municipio_id) => {
         p.nombre,
         m.nombre AS municipio,
         p.municipio_id,
-        p.creado_en,
-        p.actualizado_en
     FROM parroquias p
     JOIN municipios m ON m.id = p.municipio_id
     WHERE p.municipio_id = $1
@@ -45,8 +41,6 @@ export const get_parroquia_id = async (id) => {
         p.nombre,
         m.nombre AS municipio,
         p.municipio_id,
-        p.creado_en,
-        p.actualizado_en
     FROM parroquias p
     JOIN municipios m ON m.id = p.municipio_id
     WHERE p.id = $1
@@ -62,7 +56,7 @@ export const get_parroquia_por_nombre = async (nombre, municipio_id, id = null) 
         p.id,
         p.nombre
     FROM parroquias p
-    WHERE LOWER(p.nombre) = LOWER($1)
+    WHERE unaccent(LOWER(p.nombre)) =unaccent(LOWER($1))
       AND p.municipio_id = $2
       AND ($3::uuid IS NULL OR p.id != $3)
   `;
@@ -121,8 +115,6 @@ export const filtro_nombre_parroquia = async (nombre) => {
         p.nombre,
         m.nombre AS municipio,
         p.municipio_id,
-        p.creado_en,
-        p.actualizado_en
     FROM parroquias p
     JOIN municipios m ON m.id = p.municipio_id
     WHERE unaccent(LOWER(p.nombre)) LIKE unaccent(LOWER('%' || $1 || '%'))

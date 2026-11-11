@@ -90,7 +90,7 @@ export const c_post_parroquia = async (req, res, next) => {
     }
     //--------------------------------------------------------------
 
-    const rows = await post_parroquia(parseP.data);
+    await post_parroquia(parseP.data);
     return send_success(res, success_messages.parroquia_creada);
   } catch (error) {
     next(error);
