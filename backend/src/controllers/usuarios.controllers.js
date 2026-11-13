@@ -141,6 +141,7 @@ export const c_get_correo = async (req, res, next) => {
     if (!rows) {
       throwError(errors.usuario_no_encontrado);
     }
+    res.json(rows);
   } catch (error) {
     next(error);
   }
@@ -153,6 +154,8 @@ export const c_get_usuario_por_nombreusuario = async (req, res, next) => {
     if (!rows) {
       throwError(errors.usuario_no_encontrado);
     }
+    delete rows.contrasena;
+    res.json(rows);
   } catch (error) {
     next(error);
   }
@@ -337,7 +340,8 @@ export const login = async (req, res, next) => {
       usuario: {
         id: usuario.id,
         username: usuario.nombre_usuario,
-        rol: usuario.rol_id,
+        rol_id: usuario.rol_id,
+        rol: usuario.rol,
       },
     });
   } catch (error) {

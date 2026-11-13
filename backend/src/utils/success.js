@@ -42,6 +42,56 @@ export const success_messages = {
     message: "Inicio de sesión exitoso",
   },
 
+  // Instituciones
+  institucion_creada: {
+    status: 201,
+    message: "Institución registrada con éxito",
+  },
+  institucion_actualizada: {
+    status: 200,
+    message: "Institución actualizada con éxito",
+  },
+  institucion_activada: {
+    status: 200,
+    message: "Institución activada con éxito",
+  },
+  institucion_desactivada: {
+    status: 200,
+    message: "Institución desactivada con éxito",
+  },
+
+  // Menores
+  menor_creado: {
+    status: 201,
+    message: "Menor registrado con éxito",
+  },
+  menor_actualizado: {
+    status: 200,
+    message: "Menor actualizado con éxito",
+  },
+  menor_activado: {
+    status: 200,
+    message: "Menor activado con éxito",
+  },
+  menor_desactivado: {
+    status: 200,
+    message: "Menor desactivado con éxito",
+  },
+
+  // Talleres
+  taller_creado: {
+    status: 201,
+    message: "Taller registrado con éxito",
+  },
+  taller_actualizado: {
+    status: 200,
+    message: "Taller actualizado con éxito",
+  },
+  taller_estado_actualizado: {
+    status: 200,
+    message: "Estado del taller actualizado con éxito",
+  },
+
   // Profesiones
   profesion_creada: {
     status: 201,

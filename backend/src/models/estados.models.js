@@ -5,7 +5,7 @@ export const get_estados = async () => {
   const query = `
     SELECT
         e.id,
-        e.nombre,
+        e.nombre
     FROM estados e
     ORDER BY e.nombre ASC
   `;
@@ -18,7 +18,7 @@ export const get_estado_id = async (id) => {
   const query = `
     SELECT
         e.id,
-        e.nombre,
+        e.nombre
     FROM estados e
     WHERE e.id = $1
   `;
@@ -84,7 +84,7 @@ export const filtro_nombre_estado = async (nombre) => {
   const query = `
     SELECT
         e.id,
-        e.nombre,
+        e.nombre
     FROM estados e
     WHERE unaccent(LOWER(e.nombre)) LIKE unaccent(LOWER('%' || $1 || '%'))
     ORDER BY e.nombre ASC

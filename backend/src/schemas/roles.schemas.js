@@ -2,7 +2,14 @@ import { z } from "zod";
 
 const roles_schemas = z.object({
   nombre: z
-    .enum['superadmin','administrador','facilitador','participante','representante','representante_institucional'],
+  .enum([
+    "superadmin",
+    "administrador",
+    "facilitador",
+    "participante",
+    "representante",
+    "representante_institucional",
+  ]),
   descripcion: z
     .string()
     .max(255, "La descripción no debe exceder los 255 caracteres")
@@ -11,11 +18,7 @@ const roles_schemas = z.object({
     .transform((val) => (val === "" ? null : val)),
 
   estado: z
-    .enum(["activo", "inactivo"], {
-      errorMap: () => ({ message: "El estado debe ser 'activo' o 'inactivo'" }),
-    })
-    .default("activo"),
+    .enum(["activo", "inactivo"])
 });
 
 export default roles_schemas;
-

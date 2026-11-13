@@ -12,7 +12,7 @@ export const errors = {
     message: "Usuario no encontrado",
   },
   usuario_correo_no_encontrado: {
-    status: 409,
+    status: 404,
     message: "Correo no encontrado",
   },
   usuario_duplicado: {
@@ -32,6 +32,44 @@ export const errors = {
     message:"Tu cuenta se encuentra inactiva. Contacta al administrador",
   },
   
+
+  // Instituciones
+  institucion_no_encontrada: {
+    status: 404,
+    message: "Institución no encontrada",
+  },
+  institucion_duplicada: {
+    status: 409,
+    message: "La institución ya está registrada",
+  },
+
+  // Menores
+  menor_no_encontrado: {
+    status: 404,
+    message: "Menor no encontrado",
+  },
+  menor_cedula_duplicada: {
+    status: 409,
+    message: "Ya existe un menor registrado con esa cédula",
+  },
+
+  // Talleres
+  taller_no_encontrado: {
+    status: 404,
+    message: "Taller no encontrado",
+  },
+  taller_duplicado: {
+    status: 409,
+    message: "Ya existe un taller con ese nombre",
+  },
+  taller_sin_cupos: {
+    status: 409,
+    message: "El taller no tiene cupos disponibles",
+  },
+  taller_inactivo: {
+    status: 403,
+    message: "El taller no está disponible para inscripciones",
+  },
 
   // Profesiones
   profesion_no_encontrada: {

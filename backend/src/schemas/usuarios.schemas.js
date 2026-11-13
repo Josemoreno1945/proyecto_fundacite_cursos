@@ -1,14 +1,10 @@
 import { z } from "zod";
 import { contrasena_schemas } from "../schemas/contrasena.schemas.js";
 
-const usuario_schemas = z.object({
-  rol_id: z
-    .string()
-    .uuid("El ID del rol debe ser un UUID válido"),
+export const base_usuario_schemas = z.object({
+  rol_id: z.string().uuid("El ID del rol debe ser un UUID válido"),
 
-  profesion_id: z
-    .string()
-    .uuid("El ID de la profesión debe ser un UUID válido"),
+  profesion_id: z.string().uuid("El ID de la profesión debe ser un UUID válido"),
 
   nombre_usuario: z
     .string()
@@ -22,23 +18,20 @@ const usuario_schemas = z.object({
 
   primer_apellido: z
     .string()
-    .min(1, "El primer apellido no debe estar vacio")
+    .min(1, "El primer apellido no puede estar vacio")
     .max(100, "El primer apellido no debe superar los 100 caracteres"),
 
   cedula: z
     .string()
-    .min(1, "La cédula no puede estar vacía  ")
-    .max(15, "La cédula no debe exceder los 15 caractere  s")
+    .min(1, "La cédula no puede estar vacía")
+    .max(15, "La cédula no debe exceder los 15 caracteres")
     .regex(/^[0-9]+$/, "La cédula debe contener solo números"),
 
-  sexo: z
-    .enum(["femenino","masculino","otro"]),
+  sexo: z.enum(["femenino", "masculino", "otro"]),
 
-  nivel_instruccion: z
-    .enum(["primaria","bachiller","tsu","universitario","postgrado","otro"]),
-  
-  estado: z
-    .enum(["activo", "inactivo"]),
+  nivel_instruccion: z.enum(["primaria", "bachiller", "tsu", "universitario", "postgrado", "otro"]),
+
+  estado: z.enum(["activo", "inactivo"]),
 
   correo: z
     .string()
@@ -47,22 +40,18 @@ const usuario_schemas = z.object({
     .optional()
     .or(z.literal(""))
     .transform((val) => (val === "" ? null : val)),
-
+    
   telefono: z
     .string()
     .max(20, "El teléfono no debe exceder los 20 caracteres")
     .optional()
     .or(z.literal(""))
     .transform((val) => (val === "" ? null : val)),
-    
-    
-})
-.merge(contrasena_schemas)
-.refine((data) => data.correo || data.telefono,{
+}).merge(contrasena_schemas);
+
+const usuario_schemas = base_usuario_schemas.refine((data) => data.correo || data.telefono, {
   message: "Debe proporcionar al menos un correo electrónico o un número de teléfono.",
-  path: ["correo"], // Muestra el error en el campo correo
+  path: ["correo"],
 });
-
-
 
 export default usuario_schemas;

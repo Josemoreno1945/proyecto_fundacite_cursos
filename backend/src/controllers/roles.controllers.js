@@ -78,10 +78,12 @@ export const c_get_rol_id = async (req, res, next) => {
 export const c_get_rol_por_nombre = async (req, res, next) => {
   try {
     const nombre = req.params.nombre;
-    if (!nombre) {
+
+    const rows = await get_rol_por_nombre(nombre);
+    if (!rows){
       throwError(errors.rol_no_encontrado)
     }
-    const rows = await get_rol_por_nombre(nombre);
+
     return res.json(rows)
   } catch (error) {
     next(error);

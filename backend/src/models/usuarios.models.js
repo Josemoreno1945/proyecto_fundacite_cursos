@@ -18,7 +18,7 @@ export const get_u_activo = async () => {
         u.estado
     FROM usuarios u
     JOIN roles r ON r.id = u.rol_id
-    JOIN profesiones p ON p.id = u.profesion_id
+    LEFT JOIN profesiones p ON p.id = u.profesion_id
     WHERE u.estado='activo'
 `;
   const result = await pool.query(query);
@@ -117,7 +117,7 @@ export const get_usuario_por_correo = async (correo,id=null) => {
     FROM usuarios u
     JOIN roles r ON r.id = u.rol_id
     JOIN profesiones p ON p.id = u.profesion_id
-    WHERE u.correo = $1 AND ($2 IS NULL OR u.id != $2)
+    WHERE u.correo = $1 AND ($2::uuid IS NULL OR u.id != $2)
   `;
   const result = await pool.query(query, [correo,id]);
   return result.rows[0];
