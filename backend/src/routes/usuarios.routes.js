@@ -37,6 +37,7 @@ router.get("/usuarios", verifyToken, isAdmin, c_get_usuarios);
 router.get("/usuarios_activos", verifyToken, isAdmin, c_get_usuarios_activos);
 router.get("/usuarios_inactivos", verifyToken, isAdmin, c_get_usuarios_inactivos);
 router.get("/usuarios_en_sesion", verifyToken, c_get_usuarios_en_sesion);
+router.get("/usuarios_id/:id", verifyToken, isAdmin,c_get_usuarios_id);
 router.get("/usuarios_ver/:id", verifyToken, isAdmin,c_get_usuario_ver);
 
 
@@ -54,8 +55,7 @@ router.post("/login", login);
 router.post("/registro",registro);
 router.get("/roles_usuarios",c_get_roles_disponibles)
 
-
-// ...------------------------------------------------------------------
+//------------------------------------------------------------------
 router.post("/olvido_contrasena",olvido_contrasena);
 router.post("/cambiar_contrasena",cambiar_contrasena);
 

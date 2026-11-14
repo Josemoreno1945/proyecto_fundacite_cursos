@@ -4,6 +4,13 @@ import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import usuarios_routes from './routes/usuarios.routes.js'
+import roles_routes from './routes/roles.routes.js'
+import profesiones_routes from './routes/profesiones.routes.js'
+import estados_routes from './routes/estados.routes.js'
+import municipios_routes from './routes/municipios.routes.js'
+import parroquias_routes from './routes/parroquias.routes.js'
+import instituciones_routes from './routes/instituciones.routes.js'
+import talleres_routes from './routes/talleres.routes.js'
 
 
 const app = express();
@@ -26,6 +33,14 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api',usuarios_routes);
+app.use('/api',roles_routes);
+app.use('/api',profesiones_routes);
+app.use('/api',estados_routes);
+app.use('/api',municipios_routes);
+app.use('/api',parroquias_routes);
+app.use('/api',instituciones_routes);
+app.use('/api',talleres_routes);
+
 
 
 app.use((err, req, res, next) => {
