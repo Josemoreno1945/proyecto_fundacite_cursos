@@ -18,7 +18,7 @@ export const get_profesion_id = async (id) => {
   const query = `
     SELECT
         p.id,
-        p.nombre,
+        p.nombre
     FROM profesiones p
     WHERE p.id = $1
   `;
@@ -84,7 +84,7 @@ export const filtro_nombre_profesion = async (nombre) => {
   const query = `
     SELECT
         p.id,
-        p.nombre,
+        p.nombre
     FROM profesiones p
     WHERE unaccent(LOWER(p.nombre)) LIKE unaccent(LOWER('%' || $1 || '%'))
     ORDER BY p.nombre ASC

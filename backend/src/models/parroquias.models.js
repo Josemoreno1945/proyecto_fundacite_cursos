@@ -4,10 +4,9 @@ import { pool } from "../db.js";
 export const get_parroquias = async () => {
   const query = `
     SELECT
-        p.id,
         p.nombre,
         m.nombre AS municipio,
-        p.municipio_id,
+        p.municipio_id
     FROM parroquias p
     JOIN municipios m ON m.id = p.municipio_id
     ORDER BY p.nombre ASC
@@ -20,10 +19,9 @@ export const get_parroquias = async () => {
 export const get_parroquias_por_municipio = async (municipio_id) => {
   const query = `
     SELECT
-        p.id,
         p.nombre,
         m.nombre AS municipio,
-        p.municipio_id,
+        p.municipio_id
     FROM parroquias p
     JOIN municipios m ON m.id = p.municipio_id
     WHERE p.municipio_id = $1
@@ -37,10 +35,9 @@ export const get_parroquias_por_municipio = async (municipio_id) => {
 export const get_parroquia_id = async (id) => {
   const query = `
     SELECT
-        p.id,
         p.nombre,
         m.nombre AS municipio,
-        p.municipio_id,
+        p.municipio_id
     FROM parroquias p
     JOIN municipios m ON m.id = p.municipio_id
     WHERE p.id = $1
@@ -53,7 +50,6 @@ export const get_parroquia_id = async (id) => {
 export const get_parroquia_por_nombre = async (nombre, municipio_id, id = null) => {
   const query = `
     SELECT
-        p.id,
         p.nombre
     FROM parroquias p
     WHERE unaccent(LOWER(p.nombre)) =unaccent(LOWER($1))
@@ -114,7 +110,7 @@ export const filtro_nombre_parroquia = async (nombre) => {
         p.id,
         p.nombre,
         m.nombre AS municipio,
-        p.municipio_id,
+        p.municipio_id
     FROM parroquias p
     JOIN municipios m ON m.id = p.municipio_id
     WHERE unaccent(LOWER(p.nombre)) LIKE unaccent(LOWER('%' || $1 || '%'))

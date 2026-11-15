@@ -4,10 +4,9 @@ import { pool } from "../db.js";
 export const get_municipios = async () => {
   const query = `
     SELECT
-        m.id,
         m.nombre,
         e.nombre AS estado,
-        m.estado_id,
+        m.estado_id
     FROM municipios m
     JOIN estados e ON e.id = m.estado_id
     ORDER BY m.nombre ASC
@@ -20,10 +19,9 @@ export const get_municipios = async () => {
 export const get_municipios_por_estado = async (estado_id) => {
   const query = `
     SELECT
-        m.id,
         m.nombre,
         e.nombre AS estado,
-        m.estado_id,
+        m.estado_id
     FROM municipios m
     JOIN estados e ON e.id = m.estado_id
     WHERE m.estado_id = $1
@@ -37,10 +35,9 @@ export const get_municipios_por_estado = async (estado_id) => {
 export const get_municipio_id = async (id) => {
   const query = `
     SELECT
-        m.id,
         m.nombre,
         e.nombre AS estado,
-        m.estado_id,
+        m.estado_id
     FROM municipios m
     JOIN estados e ON e.id = m.estado_id
     WHERE m.id = $1
@@ -53,7 +50,6 @@ export const get_municipio_id = async (id) => {
 export const get_municipio_por_nombre = async (nombre, estado_id, id = null) => {
   const query = `
     SELECT
-        m.id,
         m.nombre
     FROM municipios m
     WHERE unaccent(LOWER(m.nombre)) = unaccent(LOWER($1))
@@ -116,7 +112,7 @@ export const filtro_nombre_municipio = async (nombre) => {
         m.id,
         m.nombre,
         e.nombre AS estado,
-        m.estado_id,
+        m.estado_id
     FROM municipios m
     JOIN estados e ON e.id = m.estado_id
     WHERE unaccent(LOWER(m.nombre)) LIKE unaccent(LOWER('%' || $1 || '%'))

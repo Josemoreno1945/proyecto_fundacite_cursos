@@ -30,7 +30,7 @@ export const c_filtrar_nombre_municipio = async (req, res, next) => {
 };
 
 //---------------------------------Get---------------------------------------
-export const c_get_municipios = async ( res, next) => {
+export const c_get_municipios = async (req, res, next) => {
   try {
     const rows = await get_municipios();
     res.json(rows);
@@ -41,7 +41,7 @@ export const c_get_municipios = async ( res, next) => {
 
 export const c_get_municipios_por_estado = async (req, res, next) => {
   try {
-    const estado_id = req.params.estado_id;
+    const estado_id = req.params.estado_id || req.params.id;
     const estado = await get_estado_id(estado_id);
     if (!estado) {
       throwError(errors.estado_no_encontrado);

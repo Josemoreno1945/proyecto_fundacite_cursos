@@ -42,7 +42,7 @@ export const get_u_inactivo = async () => {
         u.estado
     FROM usuarios u
     JOIN roles r ON r.id = u.rol_id
-    JOIN profesiones p ON p.id = u.profesion_id
+    LEFT JOIN profesiones p ON p.id = u.profesion_id
     WHERE u.estado='inactivo'
   `;
   const result = await pool.query(query);
@@ -67,7 +67,7 @@ export const get_usuario = async () => {
         u.estado
     FROM usuarios u
     JOIN roles r ON r.id = u.rol_id
-    JOIN profesiones p ON p.id = u.profesion_id
+    LEFT JOIN profesiones p ON p.id = u.profesion_id
 `;
   const result = await pool.query(query);
   return result.rows;
@@ -91,7 +91,7 @@ export const get_usuario_id = async (id) => {
         u.usuario_protegido
     FROM usuarios u
     JOIN roles r ON r.id = u.rol_id
-    JOIN profesiones p ON p.id = u.profesion_id
+    LEFT JOIN profesiones p ON p.id = u.profesion_id
     WHERE u.id= $1
   `;
   const result = await pool.query(query, [id]);
@@ -116,7 +116,7 @@ export const get_usuario_por_correo = async (correo,id=null) => {
         u.estado
     FROM usuarios u
     JOIN roles r ON r.id = u.rol_id
-    JOIN profesiones p ON p.id = u.profesion_id
+    LEFT JOIN profesiones p ON p.id = u.profesion_id
     WHERE u.correo = $1 AND ($2::uuid IS NULL OR u.id != $2)
   `;
   const result = await pool.query(query, [correo,id]);
@@ -143,7 +143,7 @@ export const get_usuario_por_nombreusuario = async (nombre_usuario,id=null) => {
         u.estado
     FROM usuarios u
     JOIN roles r ON r.id = u.rol_id
-    JOIN profesiones p ON p.id = u.profesion_id
+    LEFT JOIN profesiones p ON p.id = u.profesion_id
     WHERE u.nombre_usuario=$1  AND ($2 IS NULL OR u.id != $2)
 `;
   const result = await pool.query(query, [nombre_usuario,id]);
@@ -252,7 +252,7 @@ export const filtro_nombre_usuario = async (nombre_usuario) => {
         u.estado
     FROM usuarios u
     JOIN roles r ON r.id = u.rol_id
-    JOIN profesiones p ON p.id = u.profesion_id
+    LEFT JOIN profesiones p ON p.id = u.profesion_id
     WHERE unaccent (LOWER(u.nombre_usuario)) LIKE unaccent(LOWER('%' || $1 || '%')) 
   `;
   const result = await pool.query(query,[nombre_usuario]);
@@ -276,7 +276,7 @@ export const filtro_correo = async (correo) => {
         u.estado
     FROM usuarios u
     JOIN roles r ON r.id = u.rol_id
-    JOIN profesiones p ON p.id = u.profesion_id
+    LEFT JOIN profesiones p ON p.id = u.profesion_id
     WHERE unaccent (LOWER(u.correo)) LIKE unaccent(LOWER('%' || $1 || '%')) 
   `;
 
@@ -301,7 +301,7 @@ export const filtro_rol = async (nombre) => {
         u.estado
     FROM usuarios u
     JOIN roles r ON r.id = u.rol_id
-    JOIN profesiones p ON p.id = u.profesion_id
+    LEFT JOIN profesiones p ON p.id = u.profesion_id
     WHERE unaccent(LOWER(r.nombre::text)) LIKE unaccent(LOWER('%' || $1 || '%'))
   `;
   const result = await pool.query(query,[nombre]);

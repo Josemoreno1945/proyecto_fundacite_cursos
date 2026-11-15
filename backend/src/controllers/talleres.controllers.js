@@ -1,6 +1,5 @@
 import {
   get_talleres,
-  get_talleres_activos,
   get_talleres_por_estado,
   get_taller_id,
   get_taller_por_nombre,
@@ -67,18 +66,9 @@ export const c_get_talleres = async (req, res, next) => {
   }
 };
 
-export const c_get_talleres_activos = async (req, res, next) => {
-  try {
-    const rows = await get_talleres_activos();
-    res.json(rows);
-  } catch (error) {
-    next(error);
-  }
-};
-
 export const c_get_talleres_por_estado = async (req, res, next) => {
   try {
-    const { estado } = req.query;
+    const estado = req.params.estado || req.query.estado;
     if (!estado) {
       throwError(errors.campos_faltantes);
     }

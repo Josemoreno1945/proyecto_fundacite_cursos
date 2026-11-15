@@ -13,7 +13,6 @@ export const get_talleres = async () => {
         t.cupos_totales,
         t.cupos_disponibles,
         t.estado,
-        t.creado_por,
         u.nombre_usuario AS creado_por_usuario
     FROM talleres t
     JOIN usuarios u ON u.id = t.creado_por
@@ -22,7 +21,6 @@ export const get_talleres = async () => {
   const result = await pool.query(query);
   return result.rows;
 };
-
 
 export const get_talleres_por_estado = async (estado) => {
   const query = `
@@ -36,7 +34,6 @@ export const get_talleres_por_estado = async (estado) => {
         t.cupos_totales,
         t.cupos_disponibles,
         t.estado,
-        t.creado_por,
         u.nombre_usuario AS creado_por_usuario
     FROM talleres t
     JOIN usuarios u ON u.id = t.creado_por
@@ -60,8 +57,7 @@ export const get_taller_id = async (id) => {
         t.cupos_totales,
         t.cupos_disponibles,
         t.estado,
-        t.creado_por,
-        u.nombre_usuario AS creado_por_usuario,
+        u.nombre_usuario AS creado_por_usuario
     FROM talleres t
     JOIN usuarios u ON u.id = t.creado_por
     WHERE t.id = $1
@@ -76,17 +72,7 @@ export const get_taller_por_nombre = async (nombre, id = null) => {
     SELECT
         t.id,
         t.nombre
-        t.descripcion,
-        t.area,
-        t.dirigido_a,
-        t.total_horas,
-        t.cupos_totales,
-        t.cupos_disponibles,
-        t.estado,
-        t.creado_por,
-        u.nombre_usuario AS creado_por_usuario,
     FROM talleres t
-    JOIN usuarios u ON u.id = t.creado_por
     WHERE unaccent(LOWER(t.nombre)) = unaccent(LOWER($1)) AND ($2::uuid IS NULL OR t.id != $2)
   `;
   const result = await pool.query(query, [nombre, id]);
@@ -212,8 +198,7 @@ export const filtro_nombre_taller = async (nombre) => {
         t.cupos_totales,
         t.cupos_disponibles,
         t.estado,
-        t.creado_por,
-        u.nombre_usuario AS creado_por_usuario,
+        u.nombre_usuario AS creado_por_usuario
     FROM talleres t
     JOIN usuarios u ON u.id = t.creado_por
     WHERE unaccent(LOWER(t.nombre)) LIKE unaccent(LOWER('%' || $1 || '%'))
@@ -235,8 +220,7 @@ export const filtro_area_taller = async (area) => {
         t.cupos_totales,
         t.cupos_disponibles,
         t.estado,
-        t.creado_por,
-        u.nombre_usuario AS creado_por_usuario,
+        u.nombre_usuario AS creado_por_usuario
     FROM talleres t
     JOIN usuarios u ON u.id = t.creado_por
     WHERE t.area::text = $1
@@ -258,8 +242,7 @@ export const filtro_dirigido_a_taller = async (dirigido_a) => {
         t.cupos_totales,
         t.cupos_disponibles,
         t.estado,
-        t.creado_por,
-        u.nombre_usuario AS creado_por_usuario,
+        u.nombre_usuario AS creado_por_usuario
     FROM talleres t
     JOIN usuarios u ON u.id = t.creado_por
     WHERE t.dirigido_a::text = $1

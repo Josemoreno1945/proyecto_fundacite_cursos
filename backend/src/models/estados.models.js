@@ -33,7 +33,7 @@ export const get_estado_por_nombre = async (nombre, id = null) => {
         e.id,
         e.nombre
     FROM estados e
-    WHERE unaccent(LOWER(e.nombre)) =unaccent((LOWER($1)) AND ($2::uuid IS NULL OR e.id != $2)
+    WHERE unaccent(LOWER(e.nombre)) = unaccent(LOWER($1)) AND ($2::uuid IS NULL OR e.id != $2)
   `;
   const result = await pool.query(query, [nombre, id]);
   return result.rows[0];

@@ -121,18 +121,6 @@ export const c_get_usuarios_activos = async (req, res, next) => {
 };
 
 
-export const c_get_usuario_ver = async (req, res, next) => {
-  try {
-    const id = req.params.id;
-    const rows = await get_usuario_id(id);
-    if (!rows) {
-      throwError(errors.usuario_no_encontrado);
-    }
-    res.json(rows);
-  } catch (error) {
-    next(error);
-  }
-};
 //--------------------------------------get por email---------------------------
 export const c_get_correo = async (req, res, next) => {
   try {
@@ -141,6 +129,7 @@ export const c_get_correo = async (req, res, next) => {
     if (!rows) {
       throwError(errors.usuario_no_encontrado);
     }
+    delete rows.contrasena;
     res.json(rows);
   } catch (error) {
     next(error);

@@ -4,11 +4,10 @@ import { pool } from "../db.js";
 export const get_instituciones = async () => {
   const query = `
     SELECT
-        i.id,
         i.nombre,
         i.direccion,
         p.nombre AS parroquia,
-        i.parroquia_id
+        i.parroquia_id,
         i.tipo,
         i.estado
     FROM instituciones i
@@ -22,7 +21,6 @@ export const get_instituciones = async () => {
 export const get_instituciones_activas = async () => {
   const query = `
     SELECT
-        i.id,
         i.nombre,
         i.direccion,
         p.nombre AS parroquia,
@@ -41,7 +39,6 @@ export const get_instituciones_activas = async () => {
 export const get_instituciones_inactivas = async () => {
   const query = `
     SELECT
-        i.id,
         i.nombre,
         i.direccion,
         p.nombre AS parroquia,
@@ -61,7 +58,6 @@ export const get_instituciones_inactivas = async () => {
 export const get_institucion_id = async (id) => {
   const query = `
     SELECT
-        i.id,
         i.nombre,
         i.direccion,
         p.nombre AS parroquia,
@@ -80,7 +76,6 @@ export const get_institucion_id = async (id) => {
 export const get_institucion_por_nombre = async (nombre, id = null) => {
   const query = `
     SELECT
-        i.id,
         i.nombre
     FROM instituciones i
     WHERE unaccent(LOWER(i.nombre)) = unaccent(LOWER($1)) AND ($2::uuid IS NULL OR i.id != $2)

@@ -5,9 +5,7 @@ export const get_menores = async () => {
   const query = `
     SELECT
         m.id,
-        m.representante_id,
         u.nombre_usuario AS representante,
-        m.institucion_id,
         i.nombre AS institucion,
         m.cedula,
         m.primer_nombre,
@@ -29,9 +27,7 @@ export const get_menores_activos = async () => {
   const query = `
     SELECT
         m.id,
-        m.representante_id,
         u.nombre_usuario AS representante,
-        m.institucion_id,
         i.nombre AS institucion,
         m.cedula,
         m.primer_nombre,
@@ -54,9 +50,7 @@ export const get_menores_inactivos = async () => {
   const query = `
     SELECT
         m.id,
-        m.representante_id,
         u.nombre_usuario AS representante,
-        m.institucion_id,
         i.nombre AS institucion,
         m.cedula,
         m.primer_nombre,
@@ -80,9 +74,7 @@ export const get_menores_por_representante = async (representante_id) => {
   const query = `
     SELECT
         m.id,
-        m.representante_id,
         u.nombre_usuario AS representante,
-        m.institucion_id,
         i.nombre AS institucion,
         m.cedula,
         m.primer_nombre,
@@ -106,9 +98,7 @@ export const get_menor_id = async (id) => {
   const query = `
     SELECT
         m.id,
-        m.representante_id,
         u.nombre_usuario AS representante,
-        m.institucion_id,
         i.nombre AS institucion,
         m.cedula,
         m.primer_nombre,
@@ -131,9 +121,7 @@ export const get_menor_por_cedula = async (cedula, id = null) => {
   const query = `
     SELECT
         m.id,
-        m.representante_id,
         u.nombre_usuario AS representante,
-        m.institucion_id,
         i.nombre AS institucion,
         m.cedula,
         m.primer_nombre,
@@ -251,9 +239,7 @@ export const filtro_nombre_menor = async (nombre) => {
   const query = `
     SELECT
         m.id,
-        m.representante_id,
         u.nombre_usuario AS representante,
-        m.institucion_id,
         i.nombre AS institucion,
         m.cedula,
         m.primer_nombre,

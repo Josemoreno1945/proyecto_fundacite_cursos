@@ -41,7 +41,7 @@ export const c_get_parroquias = async (req, res, next) => {
 
 export const c_get_parroquias_por_municipio = async (req, res, next) => {
   try {
-    const municipio_id = req.params.municipio_id;
+    const municipio_id = req.params.municipio_id || req.params.id;
     const municipio = await get_municipio_id(municipio_id);
     if (!municipio) {
       throwError(errors.municipio_no_encontrado);
