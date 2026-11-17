@@ -78,6 +78,16 @@ export const c_get_menores_por_representante = async (req, res, next) => {
   }
 };
 
+export const c_get_menores_propios = async (req, res, next) => {
+  try {
+    const id = req.usuarios.id;
+    const rows = await get_menores_por_representante(id);
+    res.json(rows);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const c_get_menor_id = async (req, res, next) => {
   try {
     const id = req.params.id;

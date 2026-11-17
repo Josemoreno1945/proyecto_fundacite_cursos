@@ -1,4 +1,5 @@
 import { pool } from "../db.js";
+import { errors, throwError } from "../utils/errors.js";
 
 //---------------------------------Get---------------------------------------
 export const get_inscripciones = async () => {
@@ -132,6 +133,7 @@ export const verificar_inscripcion_adulto = async (taller_id, usuario_id, id = n
     FROM inscripciones
     WHERE taller_id = $1
       AND usuario_id = $2
+      AND estado != 'cancelado'
       AND ($3::uuid IS NULL OR id != $3)
   `;
   const result = await pool.query(query, [taller_id, usuario_id, id]);
@@ -144,6 +146,7 @@ export const verificar_inscripcion_menor = async (taller_id, menor_id, id = null
     FROM inscripciones
     WHERE taller_id = $1
       AND menor_id = $2
+      AND estado != 'cancelado'
       AND ($3::uuid IS NULL OR id != $3)
   `;
   const result = await pool.query(query, [taller_id, menor_id, id]);
@@ -171,6 +174,73 @@ export const post_inscripcion = async (data) => {
   ];
   const result = await pool.query(query, values);
   return result.rows[0];
+};
+
+export const post_inscripcion_con_transaccion = async (data) => {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    // Bloquear la fila del taller para evitar sobreventa concurrente
+    const tallerRes = await client.query(
+      "SELECT id, cupos_disponibles, estado, dirigido_a FROM talleres WHERE id = $1 FOR UPDATE",
+      [data.taller_id]
+    );
+    const taller = tallerRes.rows[0];
+    if (!taller) {
+      throwError(errors.taller_no_encontrado);
+    }
+
+    if (taller.estado !== "activo") {
+      throwError(errors.taller_inactivo);
+    }
+
+    if (taller.cupos_disponibles <= 0) {
+      throwError(errors.taller_sin_cupos);
+    }
+
+    // Validar concordancia de audiencia (adultos vs niños)
+    if (taller.dirigido_a === "adultos" && !data.usuario_id) {
+      throwError(errors.taller_solo_adultos);
+    }
+    if (taller.dirigido_a === "ninos" && !data.menor_id) {
+      throwError(errors.taller_solo_ninos);
+    }
+
+    // Insertar inscripción
+    const queryInscripcion = `
+      INSERT INTO inscripciones(
+          taller_id,
+          usuario_id,
+          menor_id,
+          inscrito_por,
+          estado)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *
+    `;
+    const valuesInscripcion = [
+      data.taller_id,
+      data.usuario_id ?? null,
+      data.menor_id ?? null,
+      data.inscrito_por,
+      data.estado ?? "confirmado",
+    ];
+    const inscripcionRes = await client.query(queryInscripcion, valuesInscripcion);
+
+    // Descontar cupo
+    await client.query(
+      "UPDATE talleres SET cupos_disponibles = cupos_disponibles - 1, actualizado_en = NOW() WHERE id = $1",
+      [data.taller_id]
+    );
+
+    await client.query("COMMIT");
+    return inscripcionRes.rows[0];
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
 };
 
 //--------------------------------Put----------------------------------------
@@ -216,6 +286,55 @@ export const cambiar_estado_inscripcion = async (id, estado) => {
   `;
   const result = await pool.query(query, [estado, id]);
   return result.rows[0];
+};
+
+export const cambiar_estado_inscripcion_con_transaccion = async (id, nuevo_estado) => {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    const inscripcionRes = await client.query(
+      "SELECT id, taller_id, estado FROM inscripciones WHERE id = $1 FOR UPDATE",
+      [id]
+    );
+    const inscripcion = inscripcionRes.rows[0];
+    if (!inscripcion) {
+      throwError(errors.inscripcion_no_encontrada);
+    }
+
+    if (inscripcion.estado !== "cancelado" && nuevo_estado === "cancelado") {
+      await client.query(
+        "UPDATE talleres SET cupos_disponibles = cupos_disponibles + 1, actualizado_en = NOW() WHERE id = $1 AND cupos_disponibles < cupos_totales",
+        [inscripcion.taller_id]
+      );
+    } else if (inscripcion.estado === "cancelado" && nuevo_estado === "confirmado") {
+      const tallerRes = await client.query(
+        "SELECT id, cupos_disponibles FROM talleres WHERE id = $1 FOR UPDATE",
+        [inscripcion.taller_id]
+      );
+      const taller = tallerRes.rows[0];
+      if (taller.cupos_disponibles <= 0) {
+        throwError(errors.taller_sin_cupos);
+      }
+      await client.query(
+        "UPDATE talleres SET cupos_disponibles = cupos_disponibles - 1, actualizado_en = NOW() WHERE id = $1",
+        [inscripcion.taller_id]
+      );
+    }
+
+    const updateRes = await client.query(
+      "UPDATE inscripciones SET estado = $1, actualizado_en = NOW() WHERE id = $2 RETURNING *",
+      [nuevo_estado, id]
+    );
+
+    await client.query("COMMIT");
+    return updateRes.rows[0];
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
 };
 
 //-------------------------------Filtros-----------------------------------------

@@ -7,16 +7,14 @@ import {
   verificar_inscripcion_adulto,
   verificar_inscripcion_menor,
   post_inscripcion,
+  post_inscripcion_con_transaccion,
   put_inscripcion,
   cambiar_estado_inscripcion,
+  cambiar_estado_inscripcion_con_transaccion,
   filtro_estado_inscripcion,
 } from "../models/inscripciones.models.js";
 
-import {
-  get_taller_id,
-  descontar_cupo,
-  restaurar_cupo,
-} from "../models/talleres.models.js";
+import { get_taller_id } from "../models/talleres.models.js";
 
 import { get_usuario_id } from "../models/usuarios.models.js";
 import { get_menor_id } from "../models/menores.models.js";
@@ -135,22 +133,7 @@ export const c_post_inscripcion = async (req, res, next) => {
     }
 
     //-------------------------------------------------------------
-    // 1. Validar existencia y disponibilidad del taller
-    const taller = await get_taller_id(parseI.data.taller_id);
-    if (!taller) {
-      throwError(errors.taller_no_encontrado);
-    }
-
-    if (taller.estado !== "activo") {
-      throwError(errors.taller_inactivo);
-    }
-
-    if (taller.cupos_disponibles <= 0) {
-      throwError(errors.taller_sin_cupos);
-    }
-
-    //-------------------------------------------------------------
-    // 2. Validar participante y evitar duplicados
+    // 1. Validar participante y evitar duplicados
     if (parseI.data.usuario_id) {
       const usuario = await get_usuario_id(parseI.data.usuario_id);
       if (!usuario) {
@@ -180,14 +163,13 @@ export const c_post_inscripcion = async (req, res, next) => {
     }
 
     //-------------------------------------------------------------
-    // 3. Registrar inscripción y descontar cupo
+    // 2. Registrar inscripción y descontar cupo de forma transaccional (ACID)
     const datos_para_guardar = {
       ...parseI.data,
       inscrito_por: req.usuarios.id,
     };
 
-    const row = await post_inscripcion(datos_para_guardar);
-    await descontar_cupo(parseI.data.taller_id);
+    const row = await post_inscripcion_con_transaccion(datos_para_guardar);
 
     return send_success(res, success_messages.inscripcion_creada, row);
   } catch (error) {
@@ -242,27 +224,12 @@ export const c_cambiar_estado_inscripcion = async (req, res, next) => {
       throwError(errors.campos_faltantes);
     }
 
-    const inscripcion_actual = await get_inscripcion_id(id);
-    if (!inscripcion_actual) {
-      throwError(errors.inscripcion_no_encontrada);
-    }
-
     const estados_validos = ["confirmado", "cancelado", "lista_espera"];
     if (!estados_validos.includes(estado)) {
       throwError(errors.datos_invalidos);
     }
 
-    const row = await cambiar_estado_inscripcion(id, estado);
-    if (!row) {
-      throwError(errors.inscripcion_no_encontrada);
-    }
-
-    // Ajuste dinámico de cupos en el taller según el cambio de estado
-    if (inscripcion_actual.estado !== "cancelado" && estado === "cancelado") {
-      await restaurar_cupo(row.taller_id);
-    } else if (inscripcion_actual.estado === "cancelado" && estado === "confirmado") {
-      await descontar_cupo(row.taller_id);
-    }
+    const row = await cambiar_estado_inscripcion_con_transaccion(id, estado);
 
     return send_success(res, success_messages.inscripcion_estado_actualizado, row);
   } catch (error) {

@@ -57,6 +57,22 @@ export const base_clases_schemas = z.object({
     .default("pendiente"),
 });
 
-export const clases_put_schemas = base_clases_schemas.partial();
-const clases_schemas = base_clases_schemas;
+export const clases_put_schemas = base_clases_schemas
+  .partial()
+  .refine(
+    (data) => !data.hora_inicio || !data.hora_fin || data.hora_fin > data.hora_inicio,
+    {
+      message: "La hora de fin debe ser posterior a la hora de inicio",
+      path: ["hora_fin"],
+    }
+  );
+
+const clases_schemas = base_clases_schemas.refine(
+  (data) => data.hora_fin > data.hora_inicio,
+  {
+    message: "La hora de fin debe ser posterior a la hora de inicio",
+    path: ["hora_fin"],
+  }
+);
+
 export default clases_schemas;

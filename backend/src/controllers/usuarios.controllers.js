@@ -5,6 +5,7 @@ import {
   get_usuario_id,
   get_usuario_por_correo,
   get_usuario_por_nombreusuario,
+  get_usuario_por_cedula,
   get_roles_disponibles,
   post_usuario,
   put_usuario,
@@ -164,6 +165,10 @@ export const c_post_usuario = async (req, res, next) => {
     }
 
     //-------------------------------------------------------------
+    const cedula_existe = await get_usuario_por_cedula(data.cedula);
+    if (cedula_existe) {
+      throwError(errors.usuario_cedula_duplicada);
+    }
     const correo_existe = await get_usuario_por_correo(data.correo);
     if (correo_existe) {
       throwError(errors.usuario_correo_duplicado);
@@ -212,6 +217,12 @@ export const c_put_usuarios = async (req, res, next) => {
       delete data.contrasena;
     }
     //--------------------------------------------------------------
+    if (data.cedula) {
+      const cedula_existe = await get_usuario_por_cedula(data.cedula, id);
+      if (cedula_existe) {
+        throwError(errors.usuario_cedula_duplicada);
+      }
+    }
     if (data.correo) {
       const correo_existe = await get_usuario_por_correo(data.correo, id);
       if (correo_existe) {
@@ -307,14 +318,15 @@ export const login = async (req, res, next) => {
       throwError(errors.usuario_no_encontrado);
     }
 
-    // 3. Comparar la contraseña
+    // 3. Verificar estado ANTES de comparar contraseña (evita timing attack + mejor UX)
+    if (usuario.estado !== 'activo') {
+      throwError(errors.cuenta_inactiva);
+    }
+
+    // 4. Comparar la contraseña
     const valid = await bcrypt.compare(data.contrasena, usuario.contrasena);
     if (!valid) {
       throwError(errors.contrasena_invalida);
-    }
-
-    if (usuario.estado !== 'activo') {
-      throwError(errors.cuenta_inactiva)
     }
 
     // 4. Generar el token
@@ -371,8 +383,11 @@ export const registro = async (req, res, next) => {
 
 
 
-    // 3. Verificar duplicados de correo y nombre de usuario
-
+    // 3. Verificar duplicados de cédula, correo y nombre de usuario
+    const cedula_existe = await get_usuario_por_cedula(data.cedula);
+    if (cedula_existe) {
+      throwError(errors.usuario_cedula_duplicada);
+    }
     const correo_existe = await get_usuario_por_correo(data.correo);
     if (correo_existe) {
       throwError(errors.usuario_correo_duplicado);

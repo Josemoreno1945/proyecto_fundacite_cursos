@@ -144,9 +144,22 @@ export const get_usuario_por_nombreusuario = async (nombre_usuario,id=null) => {
     FROM usuarios u
     JOIN roles r ON r.id = u.rol_id
     LEFT JOIN profesiones p ON p.id = u.profesion_id
-    WHERE u.nombre_usuario=$1  AND ($2 IS NULL OR u.id != $2)
+    WHERE u.nombre_usuario=$1  AND ($2:: uuid IS NULL OR u.id != $2)
 `;
   const result = await pool.query(query, [nombre_usuario,id]);
+  return result.rows[0];
+};
+
+//---------------------------------Get cedula---------------------------------------
+export const get_usuario_por_cedula = async (cedula, id = null) => {
+  const query = `
+    SELECT 
+        u.id,
+        u.cedula
+    FROM usuarios u
+    WHERE u.cedula = $1 AND ($2::uuid IS NULL OR u.id != $2)
+  `;
+  const result = await pool.query(query, [cedula, id]);
   return result.rows[0];
 };
 

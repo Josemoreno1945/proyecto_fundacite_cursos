@@ -23,6 +23,10 @@ export const errors = {
     status: 409,
     message: "El email ya está registrado",
   },
+  usuario_cedula_duplicada: {
+    status: 409,
+    message: "La cédula ya está registrada",
+  },
   usuario_protegido:{
     status:403,
     message:"No puedes eliminar este usuario",
@@ -69,6 +73,14 @@ export const errors = {
   taller_inactivo: {
     status: 403,
     message: "El taller no está disponible para inscripciones",
+  },
+  taller_solo_adultos: {
+    status: 400,
+    message: "Este taller está dirigido exclusivamente a adultos",
+  },
+  taller_solo_ninos: {
+    status: 400,
+    message: "Este taller está dirigido exclusivamente a niños",
   },
 
   // Inscripciones

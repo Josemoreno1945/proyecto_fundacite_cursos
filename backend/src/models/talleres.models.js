@@ -119,7 +119,6 @@ export const put_taller = async (id, data) => {
     "dirigido_a",
     "total_horas",
     "cupos_totales",
-    "cupos_disponibles",
     "estado",
   ];
 
