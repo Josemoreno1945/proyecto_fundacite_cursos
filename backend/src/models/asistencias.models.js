@@ -4,6 +4,7 @@ import { pool } from "../db.js";
 export const get_asistencias_por_clase = async (clase_id) => {
   const query = `
     SELECT
+        a.id,
         c.numero_clase,
         c.titulo AS clase_titulo,
         a.asistio,
@@ -33,6 +34,7 @@ export const get_asistencias_por_clase = async (clase_id) => {
 export const get_asistencias_por_inscripcion = async (inscripcion_id) => {
   const query = `
     SELECT
+        a.id,
         c.numero_clase,
         c.titulo AS clase_titulo,
         c.fecha AS clase_fecha,
@@ -112,6 +114,7 @@ export const put_asistencia = async (id, data) => {
 export const filtro_asistencia_por_estado = async (clase_id, asistio) => {
   const query = `
     SELECT
+        a.id,
         a.asistio,
         u.primer_nombre AS usuario_nombre,
         u.primer_apellido AS usuario_apellido,

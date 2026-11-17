@@ -17,11 +17,10 @@ import {
 } from "../models/usuarios.models.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import usuario_schemas from "../schemas/usuarios.schemas.js";
+import usuario_schemas, { usuario_put_schemas } from "../schemas/usuarios.schemas.js";
 import contrasena_schemas from "../schemas/contrasena.schemas.js";
 import login_schemas from "../schemas/login.schemas.js";
 import registro_schemas from "../schemas/registro.schemas.js";
-import usuario_put_schemas from "../schemas/usuarios_put.schemas.js"
 import nodemailer from "nodemailer";
 
 import { errors, throwError } from "../utils/errors.js";
@@ -159,6 +158,7 @@ export const c_post_usuario = async (req, res, next) => {
 
     if (!parseU.success) {
       return res.status(400).json({
+        error: parseU.error.issues[0]?.message || "Datos inválidos",
         errors: parseU.error.issues,
       });
     }
@@ -183,7 +183,7 @@ export const c_post_usuario = async (req, res, next) => {
     };
     const row = await post_usuario(datos_para_guardar);
     delete row.contrasena;
-    return send_success(res, success_messages.usuario_creado);
+    return send_success(res, success_messages.usuario_creado, row);
   } catch (error) {
     next(error);
   }
@@ -199,6 +199,7 @@ export const c_put_usuarios = async (req, res, next) => {
 
     if (!parseU.success) {
       return res.status(400).json({
+        error: parseU.error.issues[0]?.message || "Datos inválidos",
         errors: parseU.error.issues,
       });
     }
@@ -232,7 +233,7 @@ export const c_put_usuarios = async (req, res, next) => {
       throwError(errors.usuario_no_encontrado)
     }
     delete rows.contrasena;
-    return send_success(res, success_messages.usuario_actualizado);
+    return send_success(res, success_messages.usuario_actualizado, rows);
   } catch (error) {
     next(error);
   }
@@ -253,8 +254,9 @@ export const c_desactivar_usuarios = async (req, res, next) => {
       throwError(errors.usuario_protegido)
     }
 
-    await desactivar_usuario(id);
-    return send_success(res, success_messages.usuario_desactivado);
+    const row = await desactivar_usuario(id);
+    delete row?.contrasena;
+    return send_success(res, success_messages.usuario_desactivado, row);
 
   } catch (error) {
     next(error);
@@ -271,8 +273,9 @@ export const c_activar_usuarios = async (req, res, next) => {
       throwError(errors.usuario_no_encontrado)
     }
 
-    await activar_usuario(id);
-    return send_success(res, success_messages.usuario_activado);
+    const row = await activar_usuario(id);
+    delete row?.contrasena;
+    return send_success(res, success_messages.usuario_activado, row);
 
   } catch (error) {
     next(error);
@@ -290,9 +293,10 @@ export const login = async (req, res, next) => {
     //VERIFICAR SI EL USUARIO ESTA ACTIVO O NO
     
     // 1. Validar con Zod
-    const parseL= login_schemas.safeParse(data);
+    const parseL = login_schemas.safeParse(data);
     if (!parseL.success) {
       return res.status(400).json({
+        error: parseL.error.issues[0]?.message || "Datos inválidos",
         errors: parseL.error.issues,
       });
     }
@@ -350,6 +354,7 @@ export const registro = async (req, res, next) => {
     const parseU = registro_schemas.safeParse(data);
     if (!parseU.success) {
       return res.status(400).json({
+        error: parseU.error.issues[0]?.message || "Datos inválidos",
         errors: parseU.error.issues,
       });
     }
@@ -395,7 +400,7 @@ export const registro = async (req, res, next) => {
 
     const rows = await post_usuario(datos_para_guardar);
     delete rows.contrasena;
-    return send_success(res, success_messages.usuario_creado);
+    return send_success(res, success_messages.usuario_creado, rows);
   } catch (error) {
     next(error);
   }
@@ -482,6 +487,7 @@ export const cambiar_contrasena = async (req, res, next) => {
     const parseU = contrasena_schemas.safeParse({ contrasena: password });
     if (!parseU.success) {
       return res.status(400).json({
+        error: parseU.error.issues[0]?.message || "Datos inválidos",
         errors: parseU.error.issues,
       });
     }

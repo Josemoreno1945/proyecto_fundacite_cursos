@@ -10,8 +10,9 @@ import {
 
 import { get_municipio_id } from "../models/municipios.models.js";
 
-import parroquia_schemas from "../schemas/parroquias.schemas.js";
-import parroquia_put_schemas from "../schemas/parroquias_put.schemas.js";
+import parroquia_schemas, {
+  parroquia_put_schemas,
+} from "../schemas/parroquias.schemas.js";
 import { errors, throwError } from "../utils/errors.js";
 import { send_success, success_messages } from "../utils/success.js";
 
@@ -74,6 +75,7 @@ export const c_post_parroquia = async (req, res, next) => {
     const parseP = parroquia_schemas.safeParse(data);
     if (!parseP.success) {
       return res.status(400).json({
+        error: parseP.error.issues[0]?.message || "Datos inválidos",
         errors: parseP.error.issues,
       });
     }
@@ -90,8 +92,8 @@ export const c_post_parroquia = async (req, res, next) => {
     }
     //--------------------------------------------------------------
 
-    await post_parroquia(parseP.data);
-    return send_success(res, success_messages.parroquia_creada);
+    const row = await post_parroquia(parseP.data);
+    return send_success(res, success_messages.parroquia_creada, row);
   } catch (error) {
     next(error);
   }
@@ -106,6 +108,7 @@ export const c_put_parroquia = async (req, res, next) => {
     const parseP = parroquia_put_schemas.safeParse(data);
     if (!parseP.success) {
       return res.status(400).json({
+        error: parseP.error.issues[0]?.message || "Datos inválidos",
         errors: parseP.error.issues,
       });
     }
@@ -144,7 +147,7 @@ export const c_put_parroquia = async (req, res, next) => {
     if (!rows) {
       throwError(errors.parroquia_no_encontrada);
     }
-    return send_success(res, success_messages.parroquia_actualizada);
+    return send_success(res, success_messages.parroquia_actualizada, rows);
   } catch (error) {
     next(error);
   }

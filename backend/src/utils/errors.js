@@ -71,6 +71,16 @@ export const errors = {
     message: "El taller no está disponible para inscripciones",
   },
 
+  // Inscripciones
+  inscripcion_no_encontrada: {
+    status: 404,
+    message: "Inscripción no encontrada",
+  },
+  inscripcion_duplicada: {
+    status: 409,
+    message: "El participante ya está inscrito en este taller",
+  },
+
   // Clases
   clase_no_encontrada: {
     status: 404,
@@ -138,6 +148,10 @@ export const errors = {
   permiso_no_encontrado: {
     status: 404,
     message: "Permiso no encontrado",
+  },
+  permiso_duplicado: {
+    status: 409,
+    message: "El permiso ya está registrado",
   },
   permiso_ya_asignado: {
     status: 409,

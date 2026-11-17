@@ -10,8 +10,9 @@ import {
 
 import { get_estado_id } from "../models/estados.models.js";
 
-import municipio_schemas from "../schemas/municipios.schemas.js";
-import municipio_put_schemas from "../schemas/municipios_put.schemas.js";
+import municipio_schemas, {
+  municipio_put_schemas,
+} from "../schemas/municipios.schemas.js";
 import { errors, throwError } from "../utils/errors.js";
 import { send_success, success_messages } from "../utils/success.js";
 
@@ -74,6 +75,7 @@ export const c_post_municipio = async (req, res, next) => {
     const parseM = municipio_schemas.safeParse(data);
     if (!parseM.success) {
       return res.status(400).json({
+        error: parseM.error.issues[0]?.message || "Datos inválidos",
         errors: parseM.error.issues,
       });
     }
@@ -90,8 +92,8 @@ export const c_post_municipio = async (req, res, next) => {
     }
     //--------------------------------------------------------------
 
-    await post_municipio(parseM.data);
-    return send_success(res, success_messages.municipio_creado);
+    const row = await post_municipio(parseM.data);
+    return send_success(res, success_messages.municipio_creado, row);
   } catch (error) {
     next(error);
   }
@@ -106,6 +108,7 @@ export const c_put_municipio = async (req, res, next) => {
     const parseM = municipio_put_schemas.safeParse(data);
     if (!parseM.success) {
       return res.status(400).json({
+        error: parseM.error.issues[0]?.message || "Datos inválidos",
         errors: parseM.error.issues,
       });
     }
@@ -144,7 +147,7 @@ export const c_put_municipio = async (req, res, next) => {
     if (!rows) {
       throwError(errors.municipio_no_encontrado);
     }
-    return send_success(res, success_messages.municipio_actualizado);
+    return send_success(res, success_messages.municipio_actualizado, rows);
   } catch (error) {
     next(error);
   }

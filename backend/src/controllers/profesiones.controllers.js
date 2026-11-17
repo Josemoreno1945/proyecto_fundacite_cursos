@@ -7,8 +7,9 @@ import {
   filtro_nombre_profesion,
 } from "../models/profesiones.models.js";
 
-import profesion_schemas from "../schemas/profesiones.schemas.js";
-import profesion_put_schemas from "../schemas/profesiones_put.schemas.js";
+import profesion_schemas, {
+  profesion_put_schemas,
+} from "../schemas/profesiones.schemas.js";
 import { errors, throwError } from "../utils/errors.js";
 import { send_success, success_messages } from "../utils/success.js";
 
@@ -57,6 +58,7 @@ export const c_post_profesion = async (req, res, next) => {
     const parseP = profesion_schemas.safeParse(data);
     if (!parseP.success) {
       return res.status(400).json({
+        error: parseP.error.issues[0]?.message || "Datos inválidos",
         errors: parseP.error.issues,
       });
     }
@@ -68,8 +70,8 @@ export const c_post_profesion = async (req, res, next) => {
     }
     //--------------------------------------------------------------
 
-    await post_profesion(parseP.data);
-    return send_success(res, success_messages.profesion_creada);
+    const row = await post_profesion(parseP.data);
+    return send_success(res, success_messages.profesion_creada, row);
   } catch (error) {
     next(error);
   }
@@ -84,6 +86,7 @@ export const c_put_profesion = async (req, res, next) => {
     const parseP = profesion_put_schemas.safeParse(data);
     if (!parseP.success) {
       return res.status(400).json({
+        error: parseP.error.issues[0]?.message || "Datos inválidos",
         errors: parseP.error.issues,
       });
     }
@@ -106,7 +109,7 @@ export const c_put_profesion = async (req, res, next) => {
     if (!rows) {
       throwError(errors.profesion_no_encontrada);
     }
-    return send_success(res, success_messages.profesion_actualizada);
+    return send_success(res, success_messages.profesion_actualizada, rows);
   } catch (error) {
     next(error);
   }

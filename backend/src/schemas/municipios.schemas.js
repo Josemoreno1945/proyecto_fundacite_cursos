@@ -11,5 +11,5 @@ const municipio_schemas = z.object({
     .uuid("El ID del estado debe ser un UUID válido"),
 });
 
+export const municipio_put_schemas = municipio_schemas.partial();
 export default municipio_schemas;
-

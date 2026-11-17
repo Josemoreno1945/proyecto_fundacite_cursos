@@ -15,8 +15,7 @@ import {
   get_permiso_en_rol,
 } from "../models/roles.models.js";
 
-import roles_schemas from "../schemas/roles.schemas.js";
-import roles_put_schemas from "../schemas/roles_put.schemas.js";
+import roles_schemas, { roles_put_schemas } from "../schemas/roles.schemas.js";
 import { errors, throwError } from "../utils/errors.js";
 import { send_success, success_messages } from "../utils/success.js";
 
@@ -99,6 +98,7 @@ export const c_post_rol = async (req, res, next) => {
 
     if (!parseR.success) {
       return res.status(400).json({
+        error: parseR.error.issues[0]?.message || "Datos inválidos",
         errors: parseR.error.issues,
       });
     }
@@ -115,8 +115,8 @@ export const c_post_rol = async (req, res, next) => {
       estado: parseR.data.estado,
     };
 
-    const rows = await post_rol(datos_para_guardar);
-    return send_success(res, success_messages.rol_creado);
+    const row = await post_rol(datos_para_guardar);
+    return send_success(res, success_messages.rol_creado, row);
   } catch (error) {
     next(error);
   }
@@ -132,6 +132,7 @@ export const c_put_rol = async (req, res, next) => {
 
     if (!parseR.success) {
       return res.status(400).json({
+        error: parseR.error.issues[0]?.message || "Datos inválidos",
         errors: parseR.error.issues,
       });
     }
@@ -154,7 +155,7 @@ export const c_put_rol = async (req, res, next) => {
     if (!rows) {
       throwError(errors.rol_no_encontrado);
     }
-    return send_success(res, success_messages.rol_actualizado);
+    return send_success(res, success_messages.rol_actualizado, rows);
   } catch (error) {
     next(error);
   }
@@ -178,8 +179,8 @@ export const c_desactivar_rol = async (req, res, next) => {
     }
     
 
-    await desactivar_rol(id);
-    return send_success(res, success_messages.rol_desactivado);
+    const row = await desactivar_rol(id);
+    return send_success(res, success_messages.rol_desactivado, row);
   } catch (error) {
     next(error);
   }
@@ -195,8 +196,8 @@ export const c_activar_rol = async (req, res, next) => {
       throwError(errors.rol_no_encontrado)
     }
 
-    await activar_rol(id);
-    return send_success(res, success_messages.rol_activado);
+    const row = await activar_rol(id);
+    return send_success(res, success_messages.rol_activado, row);
   } catch (error) {
     next(error);
   }
@@ -238,8 +239,8 @@ export const c_asignar_permiso_a_rol = async (req, res, next) => {
       throwError(errors.permiso_ya_asignado);
     }
 
-    await asignar_permiso_a_rol(id, permiso_id);
-    return send_success(res, success_messages.permiso_asignado);
+    const row = await asignar_permiso_a_rol(id, permiso_id);
+    return send_success(res, success_messages.permiso_asignado, row);
   } catch (error) {
     next(error);
   }
@@ -258,7 +259,7 @@ export const c_quitar_permiso_de_rol = async (req, res, next) => {
     if (!rows) {
       throwError(errors.permiso_no_asignado)
     }
-    return send_success(res, success_messages.permiso_removido);
+    return send_success(res, success_messages.permiso_removido, rows);
   } catch (error) {
     next(error);
   }

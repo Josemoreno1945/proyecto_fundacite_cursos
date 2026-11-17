@@ -21,4 +21,5 @@ const roles_schemas = z.object({
     .enum(["activo", "inactivo"])
 });
 
+export const roles_put_schemas = roles_schemas.partial();
 export default roles_schemas;

@@ -186,6 +186,7 @@ export const cambiar_estado_clase = async (id, estado) => {
 export const filtro_titulo_clase = async (titulo) => {
   const query = `
     SELECT
+        c.id,
         t.nombre AS taller,
         c.numero_clase,
         c.titulo,
@@ -210,6 +211,7 @@ export const filtro_titulo_clase = async (titulo) => {
 export const get_clases_por_estado = async (estado) => {
   const query = `
     SELECT
+        c.id,
         t.nombre AS taller,
         c.numero_clase,
         c.titulo,
@@ -235,6 +237,7 @@ export const get_clases_por_estado = async (estado) => {
 export const get_facilitadores_de_clase = async (clase_id) => {
   const query = `
     SELECT
+        u.id AS facilitador_id,
         u.nombre_usuario,
         u.primer_nombre,
         u.primer_apellido,

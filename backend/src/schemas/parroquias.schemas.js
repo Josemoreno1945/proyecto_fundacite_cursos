@@ -11,4 +11,5 @@ const parroquia_schemas = z.object({
     .uuid("El ID del municipio debe ser un UUID válido"),
 });
 
+export const parroquia_put_schemas = parroquia_schemas.partial();
 export default parroquia_schemas;

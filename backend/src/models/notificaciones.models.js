@@ -4,6 +4,7 @@ import { pool } from "../db.js";
 export const get_notificaciones = async () => {
   const query = `
     SELECT
+        n.id,
         u.nombre_usuario AS usuario,
         t.nombre AS taller,
         n.tipo,
@@ -25,6 +26,7 @@ export const get_notificaciones = async () => {
 export const get_notificaciones_por_usuario = async (usuario_id) => {
   const query = `
     SELECT
+        n.id,
         t.nombre AS taller,
         n.tipo,
         n.mensaje,
@@ -67,6 +69,7 @@ export const get_notificaciones_pendientes = async () => {
 export const get_notificacion_id = async (id) => {
   const query = `
     SELECT
+        n.id,
         u.nombre_usuario AS usuario,
         t.nombre AS taller,
         n.tipo,
@@ -138,6 +141,7 @@ export const marcar_notificacion_fallida = async (id) => {
 export const filtro_notificaciones_por_canal = async (canal) => {
   const query = `
     SELECT
+        n.id,
         u.nombre_usuario AS usuario,
         t.nombre AS taller,
         n.tipo,

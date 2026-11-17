@@ -24,5 +24,5 @@ const institucion_schemas = z.object({
     .enum(["activo", "inactivo"]),
 });
 
+export const institucion_put_schemas = institucion_schemas.partial();
 export default institucion_schemas;
-

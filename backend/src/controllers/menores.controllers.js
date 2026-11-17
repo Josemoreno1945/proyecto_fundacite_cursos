@@ -15,8 +15,7 @@ import {
 import { get_usuario_id } from "../models/usuarios.models.js";
 import { get_institucion_id } from "../models/instituciones.models.js";
 
-import menor_schemas from "../schemas/menores.schemas.js";
-import menor_put_schemas from "../schemas/menores_put.schemas.js";
+import menor_schemas, { menor_put_schemas } from "../schemas/menores.schemas.js";
 
 import { errors, throwError } from "../utils/errors.js";
 import { send_success, success_messages } from "../utils/success.js";
@@ -65,22 +64,14 @@ export const c_get_menores_inactivos = async (req, res, next) => {
 
 export const c_get_menores_por_representante = async (req, res, next) => {
   try {
-    const representante_id = req.params.representante_id;
-    const representante = await get_usuario_id(representante_id);
+    const id = req.params.representante_id || req.params.id;
+    const representante = await get_usuario_id(id);
+
     if (!representante) {
       throwError(errors.usuario_no_encontrado);
     }
-    const rows = await get_menores_por_representante(representante_id);
-    res.json(rows);
-  } catch (error) {
-    next(error);
-  }
-};
 
-export const c_get_menores_propios = async (req, res, next) => {
-  try {
-    const representante_id = req.usuarios.id;
-    const rows = await get_menores_por_representante(representante_id);
+    const rows = await get_menores_por_representante(id);
     res.json(rows);
   } catch (error) {
     next(error);
@@ -100,6 +91,19 @@ export const c_get_menor_id = async (req, res, next) => {
   }
 };
 
+export const c_get_menor_por_cedula = async (req, res, next) => {
+  try {
+    const cedula = req.params.cedula;
+    const rows = await get_menor_por_cedula(cedula);
+    if (!rows) {
+      throwError(errors.menor_no_encontrado);
+    }
+    res.json(rows);
+  } catch (error) {
+    next(error);
+  }
+};
+
 //-------------------------------Post-----------------------------------------
 export const c_post_menor = async (req, res, next) => {
   try {
@@ -108,6 +112,7 @@ export const c_post_menor = async (req, res, next) => {
     const parseM = menor_schemas.safeParse(data);
     if (!parseM.success) {
       return res.status(400).json({
+        error: parseM.error.issues[0]?.message || "Datos inválidos",
         errors: parseM.error.issues,
       });
     }
@@ -133,8 +138,8 @@ export const c_post_menor = async (req, res, next) => {
     }
     //--------------------------------------------------------------
 
-    await post_menor(parseM.data);
-    return send_success(res, success_messages.menor_creado);
+    const row = await post_menor(parseM.data);
+    return send_success(res, success_messages.menor_creado, row);
   } catch (error) {
     next(error);
   }
@@ -149,6 +154,7 @@ export const c_put_menor = async (req, res, next) => {
     const parseM = menor_put_schemas.safeParse(data);
     if (!parseM.success) {
       return res.status(400).json({
+        error: parseM.error.issues[0]?.message || "Datos inválidos",
         errors: parseM.error.issues,
       });
     }
@@ -191,7 +197,7 @@ export const c_put_menor = async (req, res, next) => {
     if (!rows) {
       throwError(errors.menor_no_encontrado);
     }
-    return send_success(res, success_messages.menor_actualizado);
+    return send_success(res, success_messages.menor_actualizado, rows);
   } catch (error) {
     next(error);
   }
@@ -207,8 +213,8 @@ export const c_desactivar_menor = async (req, res, next) => {
       throwError(errors.menor_no_encontrado);
     }
 
-    await desactivar_menor(id);
-    return send_success(res, success_messages.menor_desactivado);
+    const row = await desactivar_menor(id);
+    return send_success(res, success_messages.menor_desactivado, row);
   } catch (error) {
     next(error);
   }
@@ -224,8 +230,8 @@ export const c_activar_menor = async (req, res, next) => {
       throwError(errors.menor_no_encontrado);
     }
 
-    await activar_menor(id);
-    return send_success(res, success_messages.menor_activado);
+    const row = await activar_menor(id);
+    return send_success(res, success_messages.menor_activado, row);
   } catch (error) {
     next(error);
   }

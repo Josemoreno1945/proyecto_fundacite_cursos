@@ -4,6 +4,7 @@ import { pool } from "../db.js";
 export const get_auditoria = async () => {
   const query = `
     SELECT
+        a.id,
         u.nombre_usuario AS usuario,
         a.accion,
         a.modulo,
@@ -26,6 +27,7 @@ export const get_auditoria = async () => {
 export const get_auditoria_id = async (id) => {
   const query = `
     SELECT
+        a.id,
         u.nombre_usuario AS usuario,
         a.accion,
         a.modulo,
@@ -48,6 +50,7 @@ export const get_auditoria_id = async (id) => {
 export const get_auditoria_por_usuario = async (usuario_id) => {
   const query = `
     SELECT
+        a.id,
         u.nombre_usuario AS usuario,
         a.accion,
         a.modulo,
@@ -102,6 +105,7 @@ export const post_auditoria = async (data) => {
 export const filtro_auditoria_por_modulo = async (modulo) => {
   const query = `
     SELECT
+        a.id,
         u.nombre_usuario AS usuario,
         a.accion,
         a.modulo,
@@ -123,6 +127,7 @@ export const filtro_auditoria_por_modulo = async (modulo) => {
 export const filtro_auditoria_por_tabla = async (tabla_afectada) => {
   const query = `
     SELECT
+        a.id,
         u.nombre_usuario AS usuario,
         a.accion,
         a.modulo,

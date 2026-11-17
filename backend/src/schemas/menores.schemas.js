@@ -44,7 +44,7 @@ const menor_schemas = z.object({
 
   estado: z
     .enum(["activo", "inactivo"]),
-    
 });
 
+export const menor_put_schemas = menor_schemas.partial();
 export default menor_schemas;

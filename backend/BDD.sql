@@ -77,11 +77,6 @@ CREATE TYPE "estado_notificacion" AS ENUM (
   'fallido'
 );
 
-CREATE TYPE "tipo_recuperacion" AS ENUM (
-  'correo',
-  'whatsapp'
-);
-
 CREATE TYPE "accion_auditoria" AS ENUM (
   'crear',
   'actualizar',
@@ -343,19 +338,6 @@ CREATE TABLE "notificaciones" (
 );
 
 -- ------------------------------------------------------------
---  RECUPERACIÓN DE CONTRASEÑA
--- ------------------------------------------------------------
-CREATE TABLE "recuperaciones_contrasena" (
-  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  "usuario_id" uuid NOT NULL,
-  "token" varchar(255) UNIQUE NOT NULL, -- UUID aleatorio o OTP 6 dígitos
-  "tipo" tipo_recuperacion NOT NULL,
-  "expira_en" timestamp NOT NULL,       -- NOW() + 1 hora
-  "usado" boolean NOT NULL DEFAULT false,
-  "creado_en" timestamp NOT NULL DEFAULT (now())
-);
-
--- ------------------------------------------------------------
 --  AUDITORÍA
 -- ------------------------------------------------------------
 CREATE TABLE "auditoria" (
@@ -448,7 +430,5 @@ ALTER TABLE "certificados" ADD FOREIGN KEY ("emitido_por") REFERENCES "usuarios"
 
 ALTER TABLE "notificaciones" ADD FOREIGN KEY ("usuario_id") REFERENCES "usuarios" ("id") DEFERRABLE INITIALLY IMMEDIATE;
 ALTER TABLE "notificaciones" ADD FOREIGN KEY ("taller_id") REFERENCES "talleres" ("id") DEFERRABLE INITIALLY IMMEDIATE;
-
-ALTER TABLE "recuperaciones_contrasena" ADD FOREIGN KEY ("usuario_id") REFERENCES "usuarios" ("id") DEFERRABLE INITIALLY IMMEDIATE;
 
 ALTER TABLE "auditoria" ADD FOREIGN KEY ("usuario_id") REFERENCES "usuarios" ("id") DEFERRABLE INITIALLY IMMEDIATE;

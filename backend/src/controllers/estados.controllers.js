@@ -7,8 +7,7 @@ import {
   filtro_nombre_estado,
 } from "../models/estados.models.js";
 
-import estado_schemas from "../schemas/estados.schemas.js";
-import estado_put_schemas from "../schemas/estados_put.schemas.js";
+import estado_schemas, { estado_put_schemas } from "../schemas/estados.schemas.js";
 import { errors, throwError } from "../utils/errors.js";
 import { send_success, success_messages } from "../utils/success.js";
 
@@ -58,6 +57,7 @@ export const c_post_estado = async (req, res, next) => {
 
     if (!parseE.success) {
       return res.status(400).json({
+        error: parseE.error.issues[0]?.message || "Datos inválidos",
         errors: parseE.error.issues,
       });
     }
@@ -68,8 +68,8 @@ export const c_post_estado = async (req, res, next) => {
     }
     //--------------------------------------------------------------
 
-    await post_estado(parseE.data);
-    return send_success(res, success_messages.estado_creado);
+    const row = await post_estado(parseE.data);
+    return send_success(res, success_messages.estado_creado, row);
   } catch (error) {
     next(error);
   }
@@ -84,6 +84,7 @@ export const c_put_estado = async (req, res, next) => {
     const parseE = estado_put_schemas.safeParse(data);
     if (!parseE.success) {
       return res.status(400).json({
+        error: parseE.error.issues[0]?.message || "Datos inválidos",
         errors: parseE.error.issues,
       });
     }
@@ -106,7 +107,7 @@ export const c_put_estado = async (req, res, next) => {
     if (!rows) {
       throwError(errors.estado_no_encontrado);
     }
-    return send_success(res, success_messages.estado_actualizado);
+    return send_success(res, success_messages.estado_actualizado, rows);
   } catch (error) {
     next(error);
   }

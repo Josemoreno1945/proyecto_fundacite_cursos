@@ -11,8 +11,7 @@ import {
   filtro_dirigido_a_taller,
 } from "../models/talleres.models.js";
 
-import taller_schemas from "../schemas/talleres.schemas.js";
-import taller_put_schemas from "../schemas/talleres_put.schemas.js";
+import taller_schemas, { taller_put_schemas } from "../schemas/talleres.schemas.js";
 import { errors, throwError } from "../utils/errors.js";
 import { send_success, success_messages } from "../utils/success.js";
 
@@ -100,6 +99,7 @@ export const c_post_taller = async (req, res, next) => {
     const parseT = taller_schemas.safeParse(data);
     if (!parseT.success) {
       return res.status(400).json({
+        error: parseT.error.issues[0]?.message || "Datos inválidos",
         errors: parseT.error.issues,
       });
     }
@@ -116,8 +116,8 @@ export const c_post_taller = async (req, res, next) => {
       creado_por: req.usuarios.id,
     };
 
-    await post_taller(datos_para_guardar);
-    return send_success(res, success_messages.taller_creado);
+    const row = await post_taller(datos_para_guardar);
+    return send_success(res, success_messages.taller_creado, row);
   } catch (error) {
     next(error);
   }
@@ -132,6 +132,7 @@ export const c_put_taller = async (req, res, next) => {
     const parseT = taller_put_schemas.safeParse(data);
     if (!parseT.success) {
       return res.status(400).json({
+        error: parseT.error.issues[0]?.message || "Datos inválidos",
         errors: parseT.error.issues,
       });
     }
@@ -160,7 +161,7 @@ export const c_put_taller = async (req, res, next) => {
     if (!rows) {
       throwError(errors.taller_no_encontrado);
     }
-    return send_success(res, success_messages.taller_actualizado);
+    return send_success(res, success_messages.taller_actualizado, rows);
   } catch (error) {
     next(error);
   }
@@ -186,8 +187,8 @@ export const c_cambiar_estado_taller = async (req, res, next) => {
       throwError(errors.datos_invalidos);
     }
 
-    await cambiar_estado_taller(id, estado);
-    return send_success(res, success_messages.taller_estado_actualizado);
+    const row = await cambiar_estado_taller(id, estado);
+    return send_success(res, success_messages.taller_estado_actualizado, row);
   } catch (error) {
     next(error);
   }

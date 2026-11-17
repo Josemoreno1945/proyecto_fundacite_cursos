@@ -54,4 +54,8 @@ const usuario_schemas = base_usuario_schemas.refine((data) => data.correo || dat
   path: ["correo"],
 });
 
+export const usuario_put_schemas = base_usuario_schemas
+  .omit({ contrasena: true })
+  .partial();
+
 export default usuario_schemas;

@@ -92,6 +92,20 @@ export const success_messages = {
     message: "Estado del taller actualizado con éxito",
   },
 
+  // Inscripciones
+  inscripcion_creada: {
+    status: 201,
+    message: "Inscripción realizada con éxito",
+  },
+  inscripcion_actualizada: {
+    status: 200,
+    message: "Inscripción actualizada con éxito",
+  },
+  inscripcion_estado_actualizado: {
+    status: 200,
+    message: "Estado de la inscripción actualizado con éxito",
+  },
+
   // Clases
   clase_creada: {
     status: 201,
@@ -178,5 +192,9 @@ export const success_messages = {
   permiso_removido: {
     status: 200,
     message: "Permiso removido del rol con éxito",
+  },
+  permiso_creado: {
+    status: 201,
+    message: "Permiso registrado con éxito",
   },
 };

@@ -22,7 +22,6 @@ const taller_schemas = z.object({
 
   dirigido_a: z
     .enum(["adultos", "ninos"]),
-  
 
   total_horas: z
     .number({ invalid_type_error: "El total de horas debe ser un número" })
@@ -39,4 +38,5 @@ const taller_schemas = z.object({
     .enum(["activo", "inactivo", "en_curso", "culminado", "cancelado"]),
 });
 
+export const taller_put_schemas = taller_schemas.partial();
 export default taller_schemas;

@@ -14,8 +14,9 @@ import {
 
 import { get_parroquia_id } from "../models/parroquias.models.js";
 
-import institucion_schemas from "../schemas/instituciones.schemas.js";
-import institucion_put_schemas from "../schemas/instituciones_put.schemas.js";
+import institucion_schemas, {
+  institucion_put_schemas,
+} from "../schemas/instituciones.schemas.js";
 
 import { errors, throwError } from "../utils/errors.js";
 import { send_success, success_messages } from "../utils/success.js";
@@ -96,6 +97,7 @@ export const c_post_institucion = async (req, res, next) => {
     const parseI = institucion_schemas.safeParse(data);
     if (!parseI.success) {
       return res.status(400).json({
+        error: parseI.error.issues[0]?.message || "Datos inválidos",
         errors: parseI.error.issues,
       });
     }
@@ -112,8 +114,8 @@ export const c_post_institucion = async (req, res, next) => {
     }
     //--------------------------------------------------------------
 
-    await post_institucion(parseI.data);
-    return send_success(res, success_messages.institucion_creada);
+    const row = await post_institucion(parseI.data);
+    return send_success(res, success_messages.institucion_creada, row);
   } catch (error) {
     next(error);
   }
@@ -128,6 +130,7 @@ export const c_put_institucion = async (req, res, next) => {
     const parseI = institucion_put_schemas.safeParse(data);
     if (!parseI.success) {
       return res.status(400).json({
+        error: parseI.error.issues[0]?.message || "Datos inválidos",
         errors: parseI.error.issues,
       });
     }
@@ -164,7 +167,7 @@ export const c_put_institucion = async (req, res, next) => {
     if (!rows) {
       throwError(errors.institucion_no_encontrada);
     }
-    return send_success(res, success_messages.institucion_actualizada);
+    return send_success(res, success_messages.institucion_actualizada, rows);
   } catch (error) {
     next(error);
   }
@@ -180,8 +183,8 @@ export const c_desactivar_institucion = async (req, res, next) => {
       throwError(errors.institucion_no_encontrada);
     }
 
-    await desactivar_institucion(id);
-    return send_success(res, success_messages.institucion_desactivada);
+    const row = await desactivar_institucion(id);
+    return send_success(res, success_messages.institucion_desactivada, row);
   } catch (error) {
     next(error);
   }
@@ -197,8 +200,8 @@ export const c_activar_institucion = async (req, res, next) => {
       throwError(errors.institucion_no_encontrada);
     }
 
-    await activar_institucion(id);
-    return send_success(res, success_messages.institucion_activada);
+    const row = await activar_institucion(id);
+    return send_success(res, success_messages.institucion_activada, row);
   } catch (error) {
     next(error);
   }

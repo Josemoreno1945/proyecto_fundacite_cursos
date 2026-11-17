@@ -7,5 +7,5 @@ const profesion_schemas = z.object({
     .max(100, "El nombre no debe exceder los 100 caracteres"),
 });
 
+export const profesion_put_schemas = profesion_schemas.partial();
 export default profesion_schemas;
-

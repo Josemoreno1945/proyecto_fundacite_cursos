@@ -4,19 +4,20 @@ import {
   get_clase_id,
   get_clase_por_numero,
   get_clases_por_estado,
+  get_facilitadores_de_clase,
   get_facilitador_en_clase,
   post_clase,
   put_clase,
   cambiar_estado_clase,
   filtro_titulo_clase,
   asignar_facilitador_a_clase,
-  quitar_facilitador_de_clase
+  quitar_facilitador_de_clase,
 } from "../models/clases.models.js";
 
 import { get_taller_id } from "../models/talleres.models.js";
+import { get_usuario_id } from "../models/usuarios.models.js";
 
-import clases_schemas from "../schemas/clases_schemas.js";
-import clases_put_schemas from "../schemas/clases_put.schemas.js";
+import clases_schemas, { clases_put_schemas } from "../schemas/clases.schemas.js";
 import { errors, throwError } from "../utils/errors.js";
 import { send_success, success_messages } from "../utils/success.js";
 
@@ -33,8 +34,6 @@ export const c_filtrar_titulo_clase = async (req, res, next) => {
     next(error);
   }
 };
-
-
 
 //---------------------------------Get---------------------------------------
 export const c_get_clases = async (req, res, next) => {
@@ -77,25 +76,6 @@ export const c_get_clases_por_estado = async (req, res, next) => {
   }
 };
 
-export const c_get_facilicitador_en_clase = async (req, res, next) => {
-  try {
-    const clase = req.params.clase_id || req.query.clase_id
-    if (!clase){
-      pass
-    }
-
-    const facilitador = req.params.facilitador_id || req.query.facilitador_id;
-    if (!clase) {
-      pass
-    }
-    const rows = await get_facilitador_en_clase(clase,facilitador);
-    res.json(rows);
-  } catch (error) {
-    next(error);
-  }
-};
-
-
 export const c_get_clase_id = async (req, res, next) => {
   try {
     const id = req.params.id;
@@ -109,39 +89,99 @@ export const c_get_clase_id = async (req, res, next) => {
   }
 };
 
-//---------------------------------------------------------------------------
-
-export const c_asignar_facilicitador_a_clase = async (req, res, next) => {
+//-------------------------------FACILITADORES DE CLASE-----------------------------------------
+export const c_get_facilitadores_de_clase = async (req, res, next) => {
   try {
-    const clase = req.params.clase_id || req.query.clase_id
-    if (!clase){
-      pass
+    const clase_id = req.params.clase_id || req.params.id;
+    if (!clase_id) {
+      throwError(errors.campos_faltantes);
     }
-    
-    const facilitador = req.params.facilitador_id || req.query.facilitador_id;
+
+    const clase = await get_clase_id(clase_id);
     if (!clase) {
-      pass
+      throwError(errors.clase_no_encontrada);
     }
-    const rows = await asignar_facilitador_a_clase(clase,facilitador);
+
+    const rows = await get_facilitadores_de_clase(clase_id);
     res.json(rows);
   } catch (error) {
     next(error);
   }
 };
 
-export const c_quitar_facilicitador_a_clase = async (req, res, next) => {
+export const c_get_facilitador_en_clase = async (req, res, next) => {
   try {
-    const clase = req.params.clase_id || req.query.clase_id
-    if (!clase){
-      pass
+    const clase_id = req.params.clase_id || req.query.clase_id;
+    const facilitador_id = req.params.facilitador_id || req.query.facilitador_id;
+
+    if (!clase_id || !facilitador_id) {
+      throwError(errors.campos_faltantes);
     }
-    
-    const facilitador = req.params.facilitador_id || req.query.facilitador_id;
+
+    const clase = await get_clase_id(clase_id);
     if (!clase) {
-      pass
+      throwError(errors.clase_no_encontrada);
     }
-    const rows = await quitar_facilitador_de_clase(clase,facilitador);
+
+    const rows = await get_facilitador_en_clase(clase_id, facilitador_id);
     res.json(rows);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const c_asignar_facilitador_a_clase = async (req, res, next) => {
+  try {
+    const clase_id = req.params.clase_id || req.params.id;
+    const facilitador_id = req.body.facilitador_id || req.params.facilitador_id;
+
+    if (!clase_id || !facilitador_id) {
+      throwError(errors.campos_faltantes);
+    }
+
+    const clase = await get_clase_id(clase_id);
+    if (!clase) {
+      throwError(errors.clase_no_encontrada);
+    }
+
+    const facilitador = await get_usuario_id(facilitador_id);
+    if (!facilitador) {
+      throwError(errors.usuario_no_encontrado);
+    }
+
+    const ya_asignado = await get_facilitador_en_clase(clase_id, facilitador_id);
+    if (ya_asignado) {
+      throwError(errors.facilitador_ya_asignado_a_clase);
+    }
+
+    const row = await asignar_facilitador_a_clase(clase_id, facilitador_id);
+    return send_success(res, success_messages.facilitador_asignado_a_clase, row);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const c_quitar_facilitador_a_clase = async (req, res, next) => {
+  try {
+    const clase_id = req.params.clase_id || req.params.id;
+    const facilitador_id = req.params.facilitador_id || req.body.facilitador_id;
+
+    if (!clase_id || !facilitador_id) {
+      throwError(errors.campos_faltantes);
+    }
+
+    const clase = await get_clase_id(clase_id);
+    if (!clase) {
+      throwError(errors.clase_no_encontrada);
+    }
+
+    const ya_asignado = await get_facilitador_en_clase(clase_id, facilitador_id);
+    if (!ya_asignado) {
+      throwError(errors.facilitador_no_asignado_a_clase);
+    }
+
+    await quitar_facilitador_de_clase(clase_id, facilitador_id);
+    return send_success(res, success_messages.facilitador_removido_de_clase);
   } catch (error) {
     next(error);
   }
@@ -155,12 +195,17 @@ export const c_post_clases = async (req, res, next) => {
     const parseC = clases_schemas.safeParse(data);
     if (!parseC.success) {
       return res.status(400).json({
+        error: parseC.error.issues[0]?.message || "Datos inválidos",
         errors: parseC.error.issues,
       });
     }
 
-
     //-------------------------------------------------------------
+    const taller = await get_taller_id(data.taller_id);
+    if (!taller) {
+      throwError(errors.taller_no_encontrado);
+    }
+
     const numero_existe = await get_clase_por_numero(data.taller_id, data.numero_clase);
     if (numero_existe) {
       throwError(errors.clase_numero_duplicado);
@@ -172,14 +217,12 @@ export const c_post_clases = async (req, res, next) => {
       creado_por: req.usuarios.id,
     };
 
-    await post_clase(datos_para_guardar);
-    return send_success(res, success_messages.clase_creada);
+    const row = await post_clase(datos_para_guardar);
+    return send_success(res, success_messages.clase_creada, row);
   } catch (error) {
     next(error);
   }
 };
-
-
 
 //--------------------------------Put----------------------------------------
 export const c_put_clases = async (req, res, next) => {
@@ -190,6 +233,7 @@ export const c_put_clases = async (req, res, next) => {
     const parseC = clases_put_schemas.safeParse(data);
     if (!parseC.success) {
       return res.status(400).json({
+        error: parseC.error.issues[0]?.message || "Datos inválidos",
         errors: parseC.error.issues,
       });
     }
@@ -206,12 +250,11 @@ export const c_put_clases = async (req, res, next) => {
     }
 
     //--------------------------------------------------------------
-
-    //como se adapta esto a clases o no va ????????
-    if (data.nombre) {
-      const taller_existe = await get_taller_por_nombre(data.nombre, id);
-      if (taller_existe) {
-        throwError(errors.taller_duplicado);
+    if (data.numero_clase) {
+      const taller_id_a_evaluar = data.taller_id || clase_actual.taller_id;
+      const numero_existe = await get_clase_por_numero(taller_id_a_evaluar, data.numero_clase, id);
+      if (numero_existe) {
+        throwError(errors.clase_numero_duplicado);
       }
     }
 
@@ -220,7 +263,7 @@ export const c_put_clases = async (req, res, next) => {
     if (!rows) {
       throwError(errors.clase_no_encontrada);
     }
-    return send_success(res, success_messages.clase_actualizada);
+    return send_success(res, success_messages.clase_actualizada, rows);
   } catch (error) {
     next(error);
   }
@@ -246,8 +289,8 @@ export const c_cambiar_estado_clase = async (req, res, next) => {
       throwError(errors.datos_invalidos);
     }
 
-    await cambiar_estado_clase(id, estado);
-    return send_success(res, success_messages.clase_estado_actualizado);
+    const row = await cambiar_estado_clase(id, estado);
+    return send_success(res, success_messages.clase_estado_actualizado, row);
   } catch (error) {
     next(error);
   }
