@@ -71,6 +71,25 @@ export const errors = {
     message: "El taller no está disponible para inscripciones",
   },
 
+  // Clases
+  clase_no_encontrada: {
+    status: 404,
+    message: "Clase no encontrada",
+  },
+  clase_numero_duplicado: {
+    status: 409,
+    message: "Ya existe una clase con ese número en este taller",
+  },
+  facilitador_ya_asignado_a_clase: {
+    status: 409,
+    message: "El facilitador ya está asignado a esta clase",
+  },
+  facilitador_no_asignado_a_clase: {
+    status: 404,
+    message: "El facilitador no está asignado a esta clase",
+  },
+
+
   // Profesiones
   profesion_no_encontrada: {
     status: 404,

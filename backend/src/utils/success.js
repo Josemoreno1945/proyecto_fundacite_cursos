@@ -92,6 +92,28 @@ export const success_messages = {
     message: "Estado del taller actualizado con éxito",
   },
 
+  // Clases
+  clase_creada: {
+    status: 201,
+    message: "Clase registrada con éxito",
+  },
+  clase_actualizada: {
+    status: 200,
+    message: "Clase actualizada con éxito",
+  },
+  clase_estado_actualizado: {
+    status: 200,
+    message: "Estado de la clase actualizado con éxito",
+  },
+  facilitador_asignado_a_clase: {
+    status: 200,
+    message: "Facilitador asignado a la clase con éxito",
+  },
+  facilitador_removido_de_clase: {
+    status: 200,
+    message: "Facilitador removido de la clase con éxito",
+  },
+
   // Profesiones
   profesion_creada: {
     status: 201,
