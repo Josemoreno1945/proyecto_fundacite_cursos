@@ -14,6 +14,8 @@ import { errors, throwError } from "../utils/errors.js";
 import { send_success, success_messages } from "../utils/success.js";
 
 
+//normalizar una sola manera de sacar datos , osea , req-query , req.body
+
 //---------------------------------Filtros------------------------------------
 export const c_filtrar_asistencia_por_estado = async (req, res, next) => {
   try {
@@ -21,7 +23,7 @@ export const c_filtrar_asistencia_por_estado = async (req, res, next) => {
     if (!clase_id || !asistio) {
       throwError(errors.campos_faltantes);
     }
-    const rows = await filtro_asistencia_por_estado(titulo);
+    const rows = await filtro_asistencia_por_estado(clase_id , asistio);
     res.json(rows);
   } catch (error) {
     next(error);
@@ -31,25 +33,25 @@ export const c_filtrar_asistencia_por_estado = async (req, res, next) => {
 //---------------------------------Get---------------------------------------
 export const c_get_asistencias_por_clase = async (req, res, next) => {
   try {
-    const rows = await get_asistencias_por_clase();
+    const { clase_id } = req.query;
+    if (!clase_id) {
+      throwError(errors.campos_faltantes);
+    }
+
+    const rows = await get_asistencias_por_clase(clase_id);
     res.json(rows);
   } catch (error) {
     next(error);
   }
 };
 
-export const c_get_clases_por_taller = async (req, res, next) => {
+export const c_get_asistencias_por_inscripcion = async (req, res, next) => {
   try {
-    const taller_id = req.params.taller_id || req.params.id;
-    if (!taller_id) {
+    const { inscripcion_id } = req.query;
+    if (!inscripcion_id) {
       throwError(errors.campos_faltantes);
     }
-
-    const taller = await get_taller_id(taller_id);
-    if (!taller) {
-      throwError(errors.taller_no_encontrado);
-    }
-    const rows = await get_clases_por_taller(taller_id);
+    const rows = await get_asistencias_por_inscripcion(inscripcion_id);
     res.json(rows);
   } catch (error) {
     next(error);
