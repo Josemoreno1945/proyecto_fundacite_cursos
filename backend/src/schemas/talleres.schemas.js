@@ -33,10 +33,10 @@ const taller_schemas = z.object({
     .number({ invalid_type_error: "Los cupos totales deben ser un número" })
     .int("Los cupos totales deben ser un número entero")
     .min(1, "Debe haber al menos 1 cupo"),
-
-  estado: z
-    .enum(["activo", "inactivo", "en_curso", "culminado", "cancelado"]),
 });
 
-export const taller_put_schemas = taller_schemas.partial();
+export const taller_editar_schemas = taller_schemas
+  .pick({ nombre: true, descripcion: true, total_horas: true })
+  .partial();
+
 export default taller_schemas;

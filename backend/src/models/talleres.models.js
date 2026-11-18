@@ -110,16 +110,12 @@ export const post_taller = async (data) => {
   return result.rows[0];
 };
 
-//--------------------------------Put----------------------------------------
+//--------------------------------Put (solo nombre, descripcion, total_horas)----------------------------------------
 export const put_taller = async (id, data) => {
   const columnas_permitidas = [
     "nombre",
     "descripcion",
-    "area",
-    "dirigido_a",
     "total_horas",
-    "cupos_totales",
-    "estado",
   ];
 
   const fields = [];

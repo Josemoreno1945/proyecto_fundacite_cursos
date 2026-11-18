@@ -29,6 +29,10 @@ export const success_messages = {
     status: 200,
     message: "Usuario desactivado con éxito",
   },
+  usuario_estado_actualizado: {
+    status: 200,
+    message: "Estado del usuario actualizado con éxito",
+  },
   contrasena_actualizada: {
     status: 200,
     message: "Contraseña actualizada correctamente",
@@ -90,6 +94,26 @@ export const success_messages = {
   taller_estado_actualizado: {
     status: 200,
     message: "Estado del taller actualizado con éxito",
+  },
+
+  // Certificados
+  certificado_emitido: {
+    status: 201,
+    message: "Certificado emitido con éxito",
+  },
+  certificado_estado_actualizado: {
+    status: 200,
+    message: "Estado del certificado actualizado con éxito",
+  },
+
+  // Asistencias
+  asistencia_registrada: {
+    status: 201,
+    message: "Asistencia registrada con éxito",
+  },
+  asistencia_corregida: {
+    status: 200,
+    message: "Asistencia corregida con éxito",
   },
 
   // Inscripciones

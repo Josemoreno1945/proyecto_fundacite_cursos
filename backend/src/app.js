@@ -12,6 +12,9 @@ import parroquias_routes from './routes/parroquias.routes.js'
 import instituciones_routes from './routes/instituciones.routes.js'
 import talleres_routes from './routes/talleres.routes.js'
 import menores_routes from './routes/menores.routes.js'
+import clases_routes from './routes/clases.routes.js'
+import inscripciones_routes from './routes/inscripciones.routes.js'
+import permisos_routes from './routes/permisos.routes.js'
 
 
 const app = express();
@@ -42,6 +45,9 @@ app.use('/api',parroquias_routes);
 app.use('/api',instituciones_routes);
 app.use('/api',talleres_routes);
 app.use('/api',menores_routes);
+app.use('/api',clases_routes);
+app.use('/api',inscripciones_routes);
+app.use('/api',permisos_routes);
 
 
 

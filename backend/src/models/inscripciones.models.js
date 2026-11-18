@@ -155,28 +155,6 @@ export const verificar_inscripcion_menor = async (taller_id, menor_id, id = null
 
 //-------------------------------Post-----------------------------------------
 export const post_inscripcion = async (data) => {
-  const query = `
-    INSERT INTO inscripciones(
-        taller_id,
-        usuario_id,
-        menor_id,
-        inscrito_por,
-        estado)
-    VALUES ($1, $2, $3, $4, $5)
-    RETURNING *
-  `;
-  const values = [
-    data.taller_id,
-    data.usuario_id ?? null,
-    data.menor_id ?? null,
-    data.inscrito_por,
-    data.estado ?? "confirmado",
-  ];
-  const result = await pool.query(query, values);
-  return result.rows[0];
-};
-
-export const post_inscripcion_con_transaccion = async (data) => {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
@@ -243,52 +221,8 @@ export const post_inscripcion_con_transaccion = async (data) => {
   }
 };
 
-//--------------------------------Put----------------------------------------
-export const put_inscripcion = async (id, data) => {
-  const columnas_permitidas = [
-    "estado",
-  ];
-
-  const fields = [];
-  const values = [];
-  let index = 1;
-
-  for (const [key, value] of Object.entries(data)) {
-    if (columnas_permitidas.includes(key)) {
-      fields.push(`${key} = $${index}`);
-      values.push(value);
-      index++;
-    }
-  }
-  if (fields.length === 0) return null;
-
-  fields.push(`actualizado_en = NOW()`);
-  values.push(id);
-
-  const query = `
-    UPDATE inscripciones
-      SET ${fields.join(", ")}
-    WHERE id = $${index}
-    RETURNING *
-  `;
-
-  const result = await pool.query(query, values);
-  return result.rows[0];
-};
-
 //-------------------------------Cambiar estado-----------------------------------------
-export const cambiar_estado_inscripcion = async (id, estado) => {
-  const query = `
-    UPDATE inscripciones
-    SET estado = $1, actualizado_en = NOW()
-    WHERE id = $2
-    RETURNING *;
-  `;
-  const result = await pool.query(query, [estado, id]);
-  return result.rows[0];
-};
-
-export const cambiar_estado_inscripcion_con_transaccion = async (id, nuevo_estado) => {
+export const cambiar_estado_inscripcion = async (id, nuevo_estado) => {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");

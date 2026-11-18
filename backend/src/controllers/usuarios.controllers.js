@@ -16,9 +16,10 @@ import {
   desactivar_usuario,
   activar_usuario,
 } from "../models/usuarios.models.js";
+
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import usuario_schemas, { usuario_put_schemas } from "../schemas/usuarios.schemas.js";
+import usuario_schemas from "../schemas/usuarios.schemas.js";
 import contrasena_schemas from "../schemas/contrasena.schemas.js";
 import login_schemas from "../schemas/login.schemas.js";
 import registro_schemas from "../schemas/registro.schemas.js";
@@ -33,7 +34,7 @@ export const c_filtrar_nombre_usuario = async (req, res, next) => {
     const { nombre_usuario } = req.query;
 
     if (!nombre_usuario) {
-      throwError(errors.campos_faltantes)
+      throwError(errors.campos_faltantes);
     }
 
     const rows = await filtro_nombre_usuario(nombre_usuario);
@@ -45,9 +46,9 @@ export const c_filtrar_nombre_usuario = async (req, res, next) => {
 
 export const c_filtrar_correo = async (req, res, next) => {
   try {
-    const {correo} = req.query;
+    const { correo } = req.query;
     if (!correo) {
-      throwError(errors.campos_faltantes)
+      throwError(errors.campos_faltantes);
     }
     const rows = await filtro_correo(correo);
     res.json(rows);
@@ -58,9 +59,9 @@ export const c_filtrar_correo = async (req, res, next) => {
 
 export const c_filtrar_rol = async (req, res, next) => {
   try {
-    const {nombre} = req.query;
+    const { nombre } = req.query;
     if (!nombre) {
-      throwError(errors.campos_faltantes)
+      throwError(errors.campos_faltantes);
     }
     const rows = await filtro_rol(nombre);
     res.json(rows);
@@ -124,7 +125,7 @@ export const c_get_usuarios_activos = async (req, res, next) => {
 //--------------------------------------get por email---------------------------
 export const c_get_correo = async (req, res, next) => {
   try {
-    const correo = req.params.correo
+    const correo = req.params.correo;
     const rows = await get_usuario_por_correo(correo);
     if (!rows) {
       throwError(errors.usuario_no_encontrado);
@@ -169,9 +170,11 @@ export const c_post_usuario = async (req, res, next) => {
     if (cedula_existe) {
       throwError(errors.usuario_cedula_duplicada);
     }
-    const correo_existe = await get_usuario_por_correo(data.correo);
-    if (correo_existe) {
-      throwError(errors.usuario_correo_duplicado);
+    if (data.correo) {
+      const correo_existe = await get_usuario_por_correo(data.correo);
+      if (correo_existe) {
+        throwError(errors.usuario_correo_duplicado);
+      }
     }
     const nombreusuario_existe = await get_usuario_por_nombreusuario(data.nombre_usuario);
     if (nombreusuario_existe) {
@@ -179,7 +182,7 @@ export const c_post_usuario = async (req, res, next) => {
     }
     //--------------------------------------------------------------
 
-     // Hashear contraseña
+    // Hashear contraseña
     const salt = await bcrypt.genSalt(10);
     const contrasena_hasheada = await bcrypt.hash(parseU.data.contrasena, salt);
     const datos_para_guardar = {
@@ -187,107 +190,92 @@ export const c_post_usuario = async (req, res, next) => {
       contrasena: contrasena_hasheada,
     };
     const row = await post_usuario(datos_para_guardar);
-    delete row.contrasena;
+    delete row?.contrasena;
     return send_success(res, success_messages.usuario_creado, row);
   } catch (error) {
     next(error);
   }
 };
 
-//--------------------------------Put----------------------------------------
-export const c_put_usuarios = async (req, res, next) => {
+//--------------------------------Editar (solo correo y teléfono)----------------------------------------
+export const c_editar_usuario = async (req, res, next) => {
   try {
     const id = req.params.id;
     const data = { ...req.body };
 
-    const parseU = usuario_put_schemas.safeParse(data);
-
-    if (!parseU.success) {
-      return res.status(400).json({
-        error: parseU.error.issues[0]?.message || "Datos inválidos",
-        errors: parseU.error.issues,
-      });
-    }
     //--------------------------------------------------------------
     if (Object.keys(data).length === 0) {
       throwError(errors.campos_faltantes);
     }
 
-    if (data.contrasena !== undefined) {
-      delete data.contrasena;
-    }
     //--------------------------------------------------------------
-    if (data.cedula) {
-      const cedula_existe = await get_usuario_por_cedula(data.cedula, id);
-      if (cedula_existe) {
-        throwError(errors.usuario_cedula_duplicada);
-      }
+    const usuario_actual = await get_usuario_id(id);
+    if (!usuario_actual) {
+      throwError(errors.usuario_no_encontrado);
     }
+
+    //--------------------------------------------------------------
     if (data.correo) {
       const correo_existe = await get_usuario_por_correo(data.correo, id);
       if (correo_existe) {
         throwError(errors.usuario_correo_duplicado);
       }
     }
-    if (data.nombre_usuario) {
-      const nombreusuario_existe = await get_usuario_por_nombreusuario(data.nombre_usuario, id);
-      if (nombreusuario_existe) {
-        throwError(errors.usuario_duplicado);
-      }
-    }
 
     //--------------------------------------------------------------
-    const datos_a_actualizar = { ...parseU.data };
-    delete datos_a_actualizar.contrasena;
+    const datos_a_actualizar = {};
+    if (data.correo !== undefined) datos_a_actualizar.correo = data.correo;
+    if (data.telefono !== undefined) datos_a_actualizar.telefono = data.telefono;
+
+    if (Object.keys(datos_a_actualizar).length === 0) {
+      throwError(errors.campos_faltantes);
+    }
+
     const rows = await put_usuario(id, datos_a_actualizar);
     if (!rows) {
-      throwError(errors.usuario_no_encontrado)
+      throwError(errors.usuario_no_encontrado);
     }
-    delete rows.contrasena;
+    delete rows?.contrasena;
     return send_success(res, success_messages.usuario_actualizado, rows);
   } catch (error) {
     next(error);
   }
 };
 
-//-------------------------------Desactivar-----------------------------------------
-
-export const c_desactivar_usuarios = async (req, res, next) => {
+//-------------------------------Cambiar estado (activo / inactivo)-----------------------------------------
+export const c_cambiar_estado_usuario = async (req, res, next) => {
   try {
     const id = req.params.id;
-    const usuario_a_desactivar = await get_usuario_id(id);
+    const { estado } = req.body;
 
-    if (!usuario_a_desactivar) {
-      throwError(errors.usuario_no_encontrado)
+    if (!estado) {
+      throwError(errors.campos_faltantes);
     }
 
-    if (usuario_a_desactivar?.usuario_protegido) {
-      throwError(errors.usuario_protegido)
+    const estados_validos = ["activo", "inactivo"];
+    if (!estados_validos.includes(estado)) {
+      throwError(errors.datos_invalidos);
     }
 
-    const row = await desactivar_usuario(id);
+    const usuario_actual = await get_usuario_id(id);
+    if (!usuario_actual) {
+      throwError(errors.usuario_no_encontrado);
+    }
+
+    if (usuario_actual.usuario_protegido) {
+      throwError(errors.usuario_protegido);
+    }
+
+    //--------------------------------------------------------------
+    let row;
+    if (estado === "inactivo") {
+      row = await desactivar_usuario(id);
+    } else {
+      row = await activar_usuario(id);
+    }
+
     delete row?.contrasena;
-    return send_success(res, success_messages.usuario_desactivado, row);
-
-  } catch (error) {
-    next(error);
-  }
-};
-
-//-------------------------------ACTIVAR-----------------------------------------
-export const c_activar_usuarios = async (req, res, next) => {
-  try {
-    const id = req.params.id;
-    const usuario_a_activar = await get_usuario_id(id);
-
-    if (!usuario_a_activar) {
-      throwError(errors.usuario_no_encontrado)
-    }
-
-    const row = await activar_usuario(id);
-    delete row?.contrasena;
-    return send_success(res, success_messages.usuario_activado, row);
-
+    return send_success(res, success_messages.usuario_estado_actualizado, row);
   } catch (error) {
     next(error);
   }
@@ -377,20 +365,19 @@ export const registro = async (req, res, next) => {
     const rol_valido = roles_permitidos.some((rol) => rol.id === data.rol_id);
 
     if (!rol_valido) {
-      throwError(errors.rol_no_selecionable)
+      throwError(errors.rol_no_selecionable);
     }
-
-
-
 
     // 3. Verificar duplicados de cédula, correo y nombre de usuario
     const cedula_existe = await get_usuario_por_cedula(data.cedula);
     if (cedula_existe) {
       throwError(errors.usuario_cedula_duplicada);
     }
-    const correo_existe = await get_usuario_por_correo(data.correo);
-    if (correo_existe) {
-      throwError(errors.usuario_correo_duplicado);
+    if (data.correo) {
+      const correo_existe = await get_usuario_por_correo(data.correo);
+      if (correo_existe) {
+        throwError(errors.usuario_correo_duplicado);
+      }
     }
     const nombreusuario_existe = await get_usuario_por_nombreusuario(data.nombre_usuario);
     if (nombreusuario_existe) {
@@ -399,9 +386,8 @@ export const registro = async (req, res, next) => {
     //--------------------------------------------------------------
 
     // 4. Hashear la contraseña
- 
-      const salt = await bcrypt.genSalt(10);
-      const contrasena_hasheada = await bcrypt.hash(parseU.data.contrasena, salt);
+    const salt = await bcrypt.genSalt(10);
+    const contrasena_hasheada = await bcrypt.hash(parseU.data.contrasena, salt);
 
     // 5. Inyectar de forma segura el estado por defecto ("activo")
     const datos_para_guardar = {
@@ -409,12 +395,9 @@ export const registro = async (req, res, next) => {
       contrasena: contrasena_hasheada,
       estado: "activo",
     };
-    
-
-
 
     const rows = await post_usuario(datos_para_guardar);
-    delete rows.contrasena;
+    delete rows?.contrasena;
     return send_success(res, success_messages.usuario_creado, rows);
   } catch (error) {
     next(error);
@@ -495,7 +478,7 @@ export const cambiar_contrasena = async (req, res, next) => {
   try {
     const { token, password } = req.body;
     
-    if (!password) {
+    if (!token || !password) {
       throwError(errors.campos_faltantes);
     }
 

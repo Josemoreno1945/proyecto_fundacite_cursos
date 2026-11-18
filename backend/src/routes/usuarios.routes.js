@@ -11,9 +11,8 @@ import {
   c_get_correo,
   c_get_usuario_por_nombreusuario,
   c_post_usuario,
-  c_put_usuarios,
-  c_desactivar_usuarios,
-  c_activar_usuarios,
+  c_editar_usuario,
+  c_cambiar_estado_usuario,
   login,
   registro,
   c_get_roles_disponibles,
@@ -41,16 +40,14 @@ router.get("/usuarios_en_sesion", verifyToken, c_get_usuarios_en_sesion);
 router.get("/usuarios_id/:id", verifyToken, isAdmin, c_get_usuarios_id);
 router.get("/usuarios_ver/:id", verifyToken, isAdmin, c_get_usuarios_id);
 
-// Búsqueda específica protegida
 router.get("/usuario_por_nombreusuario/:nombre_usuario", verifyToken, isAdmin, c_get_usuario_por_nombreusuario);
 router.get("/usuario_por_correo/:correo", verifyToken, isAdmin, c_get_correo);
 
-//---------------------------------Acciones Administrativas (POST / PUT)------
+//---------------------------------Acciones (POST / PUT)----------------------
 
 router.post("/post_usuario", verifyToken, isAdmin, c_post_usuario);
-router.put("/editar_usuario/:id", verifyToken, isAdmin, c_put_usuarios);
-router.put("/desactivar_usuario/:id", verifyToken, isAdmin, c_desactivar_usuarios);
-router.put("/activar_usuario/:id", verifyToken, isAdmin, c_activar_usuarios);
+router.put("/editar_usuario/:id", verifyToken, isAdmin, c_editar_usuario);
+router.put("/cambiar_estado_usuario/:id", verifyToken, isAdmin, c_cambiar_estado_usuario);
 
 //---------------------------------Autenticación y Registro Público-----------
 

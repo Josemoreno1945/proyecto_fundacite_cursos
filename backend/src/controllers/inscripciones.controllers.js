@@ -7,10 +7,7 @@ import {
   verificar_inscripcion_adulto,
   verificar_inscripcion_menor,
   post_inscripcion,
-  post_inscripcion_con_transaccion,
-  put_inscripcion,
   cambiar_estado_inscripcion,
-  cambiar_estado_inscripcion_con_transaccion,
   filtro_estado_inscripcion,
 } from "../models/inscripciones.models.js";
 
@@ -19,9 +16,7 @@ import { get_taller_id } from "../models/talleres.models.js";
 import { get_usuario_id } from "../models/usuarios.models.js";
 import { get_menor_id } from "../models/menores.models.js";
 
-import inscripcion_schemas, {
-  inscripcion_put_schemas,
-} from "../schemas/inscripciones.schemas.js";
+import inscripcion_schemas from "../schemas/inscripciones.schemas.js";
 import { errors, throwError } from "../utils/errors.js";
 import { send_success, success_messages } from "../utils/success.js";
 
@@ -169,46 +164,9 @@ export const c_post_inscripcion = async (req, res, next) => {
       inscrito_por: req.usuarios.id,
     };
 
-    const row = await post_inscripcion_con_transaccion(datos_para_guardar);
+    const row = await post_inscripcion(datos_para_guardar);
 
     return send_success(res, success_messages.inscripcion_creada, row);
-  } catch (error) {
-    next(error);
-  }
-};
-
-//--------------------------------Put----------------------------------------
-export const c_put_inscripcion = async (req, res, next) => {
-  try {
-    const id = req.params.id;
-    const data = { ...req.body };
-
-    const parseI = inscripcion_put_schemas.safeParse(data);
-    if (!parseI.success) {
-      return res.status(400).json({
-        error: parseI.error.issues[0]?.message || "Datos inválidos",
-        errors: parseI.error.issues,
-      });
-    }
-
-    //--------------------------------------------------------------
-    if (Object.keys(data).length === 0) {
-      throwError(errors.campos_faltantes);
-    }
-
-    //--------------------------------------------------------------
-    const inscripcion_actual = await get_inscripcion_id(id);
-    if (!inscripcion_actual) {
-      throwError(errors.inscripcion_no_encontrada);
-    }
-
-    //--------------------------------------------------------------
-    const row = await put_inscripcion(id, parseI.data);
-    if (!row) {
-      throwError(errors.inscripcion_no_encontrada);
-    }
-
-    return send_success(res, success_messages.inscripcion_actualizada, row);
   } catch (error) {
     next(error);
   }
@@ -229,7 +187,7 @@ export const c_cambiar_estado_inscripcion = async (req, res, next) => {
       throwError(errors.datos_invalidos);
     }
 
-    const row = await cambiar_estado_inscripcion_con_transaccion(id, estado);
+    const row = await cambiar_estado_inscripcion(id, estado);
 
     return send_success(res, success_messages.inscripcion_estado_actualizado, row);
   } catch (error) {

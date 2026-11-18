@@ -98,15 +98,14 @@ export const post_asistencia = async (data) => {
 };
 
 //--------------------------------Put----------------------------------------
-export const put_asistencia = async (id, data) => {
+export const put_asistencia = async (id, asistio) => {
   const query = `
     UPDATE asistencias
-    SET asistio = $1, registrado_por = $2, registrado_en = NOW()
-    WHERE id = $3
+    SET asistio = $1
+    WHERE id = $2
     RETURNING *
   `;
-  const values = [data.asistio, data.registrado_por, id];
-  const result = await pool.query(query, values);
+  const result = await pool.query(query, [asistio, id]);
   return result.rows[0];
 };
 

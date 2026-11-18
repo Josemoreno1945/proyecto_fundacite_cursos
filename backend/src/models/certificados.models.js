@@ -4,11 +4,13 @@ import { pool } from "../db.js";
 export const get_certificados = async () => {
   const query = `
     SELECT
+        c.id,
         c.codigo_verificacion,
         c.fecha_emision,
         em.nombre_usuario AS emitido_por_usuario,
         c.porcentaje_asistencia,
         c.archivo_url,
+        c.estado,
         t.nombre AS taller,
         u.primer_nombre AS usuario_nombre,
         u.primer_apellido AS usuario_apellido,
@@ -33,11 +35,13 @@ export const get_certificados = async () => {
 export const get_certificado_id = async (id) => {
   const query = `
     SELECT
+        c.id,
         c.codigo_verificacion,
         c.fecha_emision,
         em.nombre_usuario AS emitido_por_usuario,
         c.porcentaje_asistencia,
         c.archivo_url,
+        c.estado,
         t.nombre AS taller,
         u.primer_nombre AS usuario_nombre,
         u.primer_apellido AS usuario_apellido,
@@ -66,6 +70,7 @@ export const get_certificado_por_codigo = async (codigo_verificacion) => {
         c.fecha_emision,
         c.porcentaje_asistencia,
         c.archivo_url,
+        c.estado,
         t.nombre AS taller,
         t.total_horas,
         t.area,
@@ -90,11 +95,13 @@ export const get_certificado_por_codigo = async (codigo_verificacion) => {
 export const get_certificado_por_inscripcion = async (inscripcion_id) => {
   const query = `
     SELECT
+        c.id,
         c.inscripcion_id,
         c.codigo_verificacion,
         c.fecha_emision,
         c.porcentaje_asistencia,
         c.archivo_url,
+        c.estado,
         c.creado_en
     FROM certificados c
     WHERE c.inscripcion_id = $1
@@ -126,36 +133,15 @@ export const post_certificado = async (data) => {
   return result.rows[0];
 };
 
-//--------------------------------Put----------------------------------------
-export const put_certificado = async (id, data) => {
-  const columnas_permitidas = [
-    "porcentaje_asistencia",
-    "archivo_url",
-  ];
-
-  const fields = [];
-  const values = [];
-  let index = 1;
-
-  for (const [key, value] of Object.entries(data)) {
-    if (columnas_permitidas.includes(key)) {
-      fields.push(`${key} = $${index}`);
-      values.push(value);
-      index++;
-    }
-  }
-  if (fields.length === 0) return null;
-
-  values.push(id);
-
+//-------------------------------Cambiar estado (emitido / anulado)----------------------------------
+export const cambiar_estado_certificado = async (id, estado) => {
   const query = `
     UPDATE certificados
-      SET ${fields.join(", ")}
-    WHERE id = $${index}
+    SET estado = $1
+    WHERE id = $2
     RETURNING *
   `;
-
-  const result = await pool.query(query, values);
+  const result = await pool.query(query, [estado, id]);
   return result.rows[0];
 };
 
@@ -165,6 +151,7 @@ export const filtro_codigo_certificado = async (codigo) => {
     SELECT
         c.codigo_verificacion,
         c.fecha_emision,
+        c.estado,
         t.nombre AS taller,
         u.primer_nombre AS usuario_nombre,
         u.primer_apellido AS usuario_apellido,

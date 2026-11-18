@@ -11,7 +11,8 @@ import {
   filtro_dirigido_a_taller,
 } from "../models/talleres.models.js";
 
-import taller_schemas, { taller_put_schemas } from "../schemas/talleres.schemas.js";
+import { pool } from "../db.js";
+import taller_schemas, { taller_editar_schemas } from "../schemas/talleres.schemas.js";
 import { errors, throwError } from "../utils/errors.js";
 import { send_success, success_messages } from "../utils/success.js";
 
@@ -113,6 +114,7 @@ export const c_post_taller = async (req, res, next) => {
 
     const datos_para_guardar = {
       ...parseT.data,
+      estado: "borrador",
       creado_por: req.usuarios.id,
     };
 
@@ -123,13 +125,13 @@ export const c_post_taller = async (req, res, next) => {
   }
 };
 
-//--------------------------------Put----------------------------------------
-export const c_put_taller = async (req, res, next) => {
+//--------------------------------put----------------------------------------
+export const c_editar_taller = async (req, res, next) => {
   try {
     const id = req.params.id;
     const data = { ...req.body };
 
-    const parseT = taller_put_schemas.safeParse(data);
+    const parseT = taller_editar_schemas.safeParse(data);
     if (!parseT.success) {
       return res.status(400).json({
         error: parseT.error.issues[0]?.message || "Datos inválidos",
@@ -138,7 +140,7 @@ export const c_put_taller = async (req, res, next) => {
     }
 
     //--------------------------------------------------------------
-    if (Object.keys(data).length === 0) {
+    if (Object.keys(parseT.data).length === 0) {
       throwError(errors.campos_faltantes);
     }
 
@@ -149,8 +151,14 @@ export const c_put_taller = async (req, res, next) => {
     }
 
     //--------------------------------------------------------------
-    if (data.nombre) {
-      const taller_existe = await get_taller_por_nombre(data.nombre, id);
+    // Solo se puede editar si el taller está en 'borrador' o 'inactivo'
+    if (!["borrador", "inactivo"].includes(taller_actual.estado)) {
+      throwError(errors.taller_no_editable);
+    }
+
+    //--------------------------------------------------------------
+    if (parseT.data.nombre) {
+      const taller_existe = await get_taller_por_nombre(parseT.data.nombre, id);
       if (taller_existe) {
         throwError(errors.taller_duplicado);
       }
@@ -182,7 +190,7 @@ export const c_cambiar_estado_taller = async (req, res, next) => {
       throwError(errors.taller_no_encontrado);
     }
 
-    const estados_validos = ["activo", "inactivo", "en_curso", "culminado", "cancelado"];
+    const estados_validos = ["borrador", "activo", "inactivo", "en_curso", "culminado", "cancelado"];
     if (!estados_validos.includes(estado)) {
       throwError(errors.datos_invalidos);
     }

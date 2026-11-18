@@ -32,11 +32,17 @@ CREATE TYPE "dirigido_a" AS ENUM (
 
 
 CREATE TYPE "estado_taller" AS ENUM (
+  'borrador',
   'activo',
   'inactivo',
   'en_curso',
   'culminado',
   'cancelado'
+);
+
+CREATE TYPE "estado_certificado" AS ENUM (
+  'emitido',
+  'anulado'
 );
 
 
@@ -253,7 +259,7 @@ CREATE TABLE "talleres" (
   "total_horas" int NOT NULL DEFAULT 0,
   "cupos_totales" int NOT NULL,
   "cupos_disponibles" int NOT NULL,     -- El backend descuenta 1 por cada inscripción confirmada
-  "estado" estado_taller NOT NULL DEFAULT 'activo',
+  "estado" estado_taller NOT NULL DEFAULT 'borrador',
   "creado_por" uuid NOT NULL,
   "creado_en" timestamp NOT NULL DEFAULT (now()),
   "actualizado_en" timestamp
@@ -364,6 +370,7 @@ CREATE TABLE "certificados" (
   "emitido_por" uuid NOT NULL,
   "porcentaje_asistencia" numeric(5,2),
   "archivo_url" text,
+  "estado" estado_certificado NOT NULL DEFAULT 'emitido',
   "creado_en" timestamp NOT NULL DEFAULT (now())
 );
 

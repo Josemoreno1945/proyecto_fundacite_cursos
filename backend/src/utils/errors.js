@@ -29,7 +29,7 @@ export const errors = {
   },
   usuario_protegido:{
     status:403,
-    message:"No puedes eliminar este usuario",
+    message:"No puedes modificar este usuario",
   },
   cuenta_inactiva:{
     status:403,
@@ -82,6 +82,18 @@ export const errors = {
     status: 400,
     message: "Este taller está dirigido exclusivamente a niños",
   },
+  taller_cupos_invalidos: {
+    status: 400,
+    message: "No se puede reducir cupos por debajo de las inscripciones activas",
+  },
+  taller_audiencia_inmutable: {
+    status: 403,
+    message: "No se puede cambiar la audiencia del taller porque ya tiene inscritos",
+  },
+  taller_no_editable: {
+    status: 403,
+    message: "Solo se pueden editar talleres en estado 'borrador' o 'inactivo'",
+  },
 
   // Inscripciones
   inscripcion_no_encontrada: {
@@ -102,6 +114,14 @@ export const errors = {
     status: 409,
     message: "Ya existe una clase con ese número en este taller",
   },
+  clase_no_editable: {
+    status: 403,
+    message: "Solo se pueden editar clases en estado 'pendiente'",
+  },
+  clase_taller_inmutable: {
+    status: 403,
+    message: "No se puede cambiar el taller de una clase ya creada",
+  },
   facilitador_ya_asignado_a_clase: {
     status: 409,
     message: "El facilitador ya está asignado a esta clase",
@@ -111,6 +131,30 @@ export const errors = {
     message: "El facilitador no está asignado a esta clase",
   },
 
+
+  // Certificados
+  certificado_no_encontrado: {
+    status: 404,
+    message: "Certificado no encontrado",
+  },
+  certificado_duplicado: {
+    status: 409,
+    message: "Ya existe un certificado para esta inscripción",
+  },
+  certificado_anulado: {
+    status: 403,
+    message: "El certificado está anulado y no puede usarse",
+  },
+
+  // Asistencias
+  asistencia_no_encontrada: {
+    status: 404,
+    message: "Registro de asistencia no encontrado",
+  },
+  asistencia_duplicada: {
+    status: 409,
+    message: "Ya existe un registro de asistencia para esta clase e inscripción",
+  },
 
   // Profesiones
   profesion_no_encontrada: {

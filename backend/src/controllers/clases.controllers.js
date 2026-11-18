@@ -214,7 +214,6 @@ export const c_post_clases = async (req, res, next) => {
 
     const datos_para_guardar = {
       ...parseC.data,
-      creado_por: req.usuarios.id,
     };
 
     const row = await post_clase(datos_para_guardar);
@@ -250,9 +249,21 @@ export const c_put_clases = async (req, res, next) => {
     }
 
     //--------------------------------------------------------------
+    // Solo se puede editar si la clase está en estado 'pendiente'
+    if (clase_actual.estado !== "pendiente") {
+      throwError(errors.clase_no_editable);
+    }
+
+    //--------------------------------------------------------------
+    // Inmutabilidad: no se permite cambiar el taller_id
+    if (parseC.data.taller_id && parseC.data.taller_id !== clase_actual.taller_id) {
+      throwError(errors.clase_taller_inmutable);
+    }
+    delete parseC.data.taller_id;
+
+    //--------------------------------------------------------------
     if (data.numero_clase) {
-      const taller_id_a_evaluar = data.taller_id || clase_actual.taller_id;
-      const numero_existe = await get_clase_por_numero(taller_id_a_evaluar, data.numero_clase, id);
+      const numero_existe = await get_clase_por_numero(clase_actual.taller_id, data.numero_clase, id);
       if (numero_existe) {
         throwError(errors.clase_numero_duplicado);
       }

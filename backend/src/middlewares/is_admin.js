@@ -1,7 +1,7 @@
 export const isAdmin = (req, res, next) => {
   if (
     req.usuarios &&
-    (req.usuarios.rol === "superadmin" || req.usuarios.rol === "administrador")
+    (req.usuarios.rol === "superadmin" || req.usuarios.rol === "administrador" || req.usuarios.rol === "facilitador")
   ) {
     return next();
   }
