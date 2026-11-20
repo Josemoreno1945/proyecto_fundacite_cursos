@@ -15,6 +15,7 @@ import {
   get_permiso_en_rol,
 } from "../models/roles.models.js";
 
+import { get_permiso_id } from "../models/permisos.models.js";
 import roles_schemas, { roles_put_schemas } from "../schemas/roles.schemas.js";
 import { errors, throwError } from "../utils/errors.js";
 import { send_success, success_messages } from "../utils/success.js";
@@ -232,6 +233,11 @@ export const c_asignar_permiso_a_rol = async (req, res, next) => {
     const rol = await get_rol_id(id);
     if (!rol) {
       throwError(errors.rol_no_encontrado);
+    }
+
+    const permiso = await get_permiso_id(permiso_id);
+    if (!permiso) {
+      throwError(errors.permiso_no_encontrado);
     }
 
     const ya_asignado = await get_permiso_en_rol(id, permiso_id);

@@ -69,7 +69,7 @@ export const get_rol_por_nombre = async (nombre, id = null) => {
         r.descripcion,
         r.estado
     FROM roles r
-    WHERE r.nombre::text = $1 AND ($2 IS NULL OR r.id != $2)
+    WHERE r.nombre::text = $1 AND ($2::uuid IS NULL OR r.id != $2)
   `;
   const result = await pool.query(query, [nombre, id]);
   return result.rows[0];

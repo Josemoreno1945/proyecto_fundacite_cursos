@@ -124,6 +124,9 @@ export const c_get_facilitador_en_clase = async (req, res, next) => {
     }
 
     const rows = await get_facilitador_en_clase(clase_id, facilitador_id);
+    if (!rows) {
+      throwError(errors.facilitador_no_asignado_a_clase);
+    }
     res.json(rows);
   } catch (error) {
     next(error);
