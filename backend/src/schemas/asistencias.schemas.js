@@ -13,4 +13,5 @@ const asistencia_schemas = z.object({
     .enum(["asistio", "no_asistio"]),
 });
 
+export const asistencia_put_schemas = asistencia_schemas.partial();
 export default asistencia_schemas;

@@ -29,4 +29,5 @@ const notificacion_schemas = z.object({
     .default("pendiente"),
 });
 
+export const notificacion_put_schemas = notificacion_schemas.partial();
 export default notificacion_schemas;

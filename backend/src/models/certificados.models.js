@@ -96,7 +96,6 @@ export const get_certificado_por_inscripcion = async (inscripcion_id) => {
   const query = `
     SELECT
         c.id,
-        c.inscripcion_id,
         c.codigo_verificacion,
         c.fecha_emision,
         c.porcentaje_asistencia,

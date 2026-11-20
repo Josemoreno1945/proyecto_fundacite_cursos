@@ -4,7 +4,7 @@ import { contrasena_schemas } from "../schemas/contrasena.schemas.js";
 export const base_usuario_schemas = z.object({
   rol_id: z.string().uuid("El ID del rol debe ser un UUID válido"),
 
-  profesion_id: z.string().uuid("El ID de la profesión debe ser un UUID válido"),
+  profesion_id: z.string().uuid("El ID de la profesión debe ser un UUID válido").optional().nullable(),
 
   nombre_usuario: z
     .string()

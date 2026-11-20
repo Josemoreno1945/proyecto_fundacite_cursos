@@ -30,7 +30,7 @@ router.get("/clases", verifyToken,isAdmin, c_get_clases);
 router.get("/clases_id/:id", verifyToken,isAdmin, c_get_clase_id);
 
 router.get("/clases_por_taller/:taller_id",verifyToken,isAdmin,c_get_clases_por_taller);
-router.get("/clases_por_estado/:estado_id",verifyToken,isAdmin,c_get_clases_por_estado);
+router.get("/clases_por_estado/:estado",verifyToken,isAdmin,c_get_clases_por_estado);
 
 router.get("/facilitadores_de_clase/:clase_id",verifyToken,isAdmin,c_get_facilitadores_de_clase);
 router.get("/facilitador_en_clase/:clase_id/:facilitador_id",verifyToken,isAdmin,c_get_facilitador_en_clase);
@@ -38,7 +38,7 @@ router.get("/facilitador_en_clase/:clase_id/:facilitador_id",verifyToken,isAdmin
 //----------------------------------------------------------------------------
 
 router.post("/asignar_facilitador/:clase_id/:facilitador_id",verifyToken,isAdmin,c_asignar_facilitador_a_clase);
-router.put("/quitar_facilitador/:clase_id/:facilitador_id", verifyToken, isAdmin, c_quitar_facilitador_a_clase);
+router.delete("/quitar_facilitador/:clase_id/:facilitador_id", verifyToken, isAdmin, c_quitar_facilitador_a_clase);
 
 //---------------------------------POST / PUT---------------------------------
 

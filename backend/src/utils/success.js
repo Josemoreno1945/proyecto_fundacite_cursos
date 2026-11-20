@@ -116,6 +116,26 @@ export const success_messages = {
     message: "Asistencia corregida con éxito",
   },
 
+  // Auditoría
+  auditoria_creada: {
+    status: 201,
+    message: "Registro de auditoría creado con éxito",
+  },
+
+  // Notificaciones
+  notificacion_creada: {
+    status: 201,
+    message: "Notificación registrada con éxito",
+  },
+  notificacion_enviada: {
+    status: 200,
+    message: "Notificación marcada como enviada",
+  },
+  notificacion_fallida: {
+    status: 200,
+    message: "Notificación marcada como fallida",
+  },
+
   // Inscripciones
   inscripcion_creada: {
     status: 201,

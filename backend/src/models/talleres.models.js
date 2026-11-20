@@ -92,7 +92,7 @@ export const post_taller = async (data) => {
         cupos_disponibles,
         estado,
         creado_por)
-    VALUES ($1, $2, $3, $4, $5, $6, $6, $7, $8)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     RETURNING *
   `;
 
@@ -102,6 +102,7 @@ export const post_taller = async (data) => {
     data.area ?? "otro",
     data.dirigido_a,
     data.total_horas ?? 0,
+    data.cupos_totales,
     data.cupos_totales,
     data.estado ?? "activo",
     data.creado_por,

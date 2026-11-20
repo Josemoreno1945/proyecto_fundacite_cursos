@@ -26,4 +26,5 @@ const certificado_schemas = z.object({
     .transform((val) => (val === "" || val === undefined ? null : val)),
 });
 
+export const certificado_put_schemas = certificado_schemas.partial();
 export default certificado_schemas;

@@ -18,7 +18,7 @@ router.get("/permiso_id/:id", verifyToken, isAdmin, c_get_permiso_id);
 
 //---------------------------------POST---------------------------------------
 
-router.post("/post_permiso", verifyToken, c_post_permiso);
+router.post("/post_permiso", verifyToken, isAdmin, c_post_permiso);
 
 export default router;
 

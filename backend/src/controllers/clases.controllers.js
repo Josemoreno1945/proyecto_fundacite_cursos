@@ -65,7 +65,7 @@ export const c_get_clases_por_taller = async (req, res, next) => {
 
 export const c_get_clases_por_estado = async (req, res, next) => {
   try {
-    const estado = req.params.estado || req.query.estado;
+    const estado = req.params.estado || req.params.estado_id || req.query.estado;
     if (!estado) {
       throwError(errors.campos_faltantes);
     }

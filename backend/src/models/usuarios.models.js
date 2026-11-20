@@ -371,7 +371,7 @@ export const get_roles_disponibles = async () => {
       nombre
     FROM roles 
     WHERE nombre::text IN ('participante', 'facilitador', 'representante')
-    ORDER BY id ASC;
+    ORDER BY nombre ASC;
   `;
   const result = await pool.query(query);
   return result.rows;

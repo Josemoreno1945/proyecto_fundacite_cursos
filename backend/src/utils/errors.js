@@ -156,6 +156,18 @@ export const errors = {
     message: "Ya existe un registro de asistencia para esta clase e inscripción",
   },
 
+  // Auditoría
+  auditoria_no_encontrada: {
+    status: 404,
+    message: "Registro de auditoría no encontrado",
+  },
+
+  // Notificaciones
+  notificacion_no_encontrada: {
+    status: 404,
+    message: "Notificación no encontrada",
+  },
+
   // Profesiones
   profesion_no_encontrada: {
     status: 404,

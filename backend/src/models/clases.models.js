@@ -56,6 +56,7 @@ export const get_clase_id = async (id) => {
   const query = `
     SELECT
         c.id,
+        c.taller_id,
         t.nombre AS taller,
         c.numero_clase,
         c.titulo,

@@ -15,6 +15,10 @@ import menores_routes from './routes/menores.routes.js'
 import clases_routes from './routes/clases.routes.js'
 import inscripciones_routes from './routes/inscripciones.routes.js'
 import permisos_routes from './routes/permisos.routes.js'
+import asistencias_routes from './routes/asistencias.routes.js'
+import auditoria_routes from './routes/auditoria.routes.js'
+import certificados_routes from './routes/certificados.routes.js'
+import notificaciones_routes from './routes/notificaciones.routes.js'
 
 
 const app = express();
@@ -48,6 +52,10 @@ app.use('/api',menores_routes);
 app.use('/api',clases_routes);
 app.use('/api',inscripciones_routes);
 app.use('/api',permisos_routes);
+app.use('/api',asistencias_routes);
+app.use('/api',auditoria_routes);
+app.use('/api',certificados_routes);
+app.use('/api',notificaciones_routes);
 
 
 
