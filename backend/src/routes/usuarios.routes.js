@@ -22,6 +22,7 @@ import {
 
 import { verifyToken } from "../middlewares/auth.js";
 import { isAdmin } from "../middlewares/is_admin.js";
+import { evitar_duplicados } from "../middlewares/evitar_duplicados.js";
 
 const router = Router();
 
@@ -45,19 +46,19 @@ router.get("/usuario_por_correo/:correo", verifyToken, isAdmin, c_get_correo);
 
 //---------------------------------Acciones (POST / PUT)----------------------
 
-router.post("/post_usuario", verifyToken, isAdmin, c_post_usuario);
-router.put("/editar_usuario/:id", verifyToken, isAdmin, c_editar_usuario);
-router.put("/cambiar_estado_usuario/:id", verifyToken, isAdmin, c_cambiar_estado_usuario);
+router.post("/post_usuario", verifyToken, isAdmin, evitar_duplicados(2), c_post_usuario);
+router.put("/editar_usuario/:id", verifyToken, c_editar_usuario);
+router.put("/cambiar_estado_usuario/:id", verifyToken, isAdmin, evitar_duplicados(2), c_cambiar_estado_usuario);
 
 //---------------------------------Autenticación y Registro Público-----------
 
-router.post("/login", login);
-router.post("/registro", registro);
+router.post("/login", evitar_duplicados(1), login);
+router.post("/registro", evitar_duplicados(3), registro);
 router.get("/roles_usuarios", c_get_roles_disponibles);
 
 //---------------------------------Recuperación de Contraseña-----------------
 
-router.post("/olvido_contrasena", olvido_contrasena);
-router.post("/cambiar_contrasena", cambiar_contrasena);
+router.post("/olvido_contrasena", evitar_duplicados(5), olvido_contrasena);
+router.post("/cambiar_contrasena", evitar_duplicados(3), cambiar_contrasena);
 
 export default router;

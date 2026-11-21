@@ -19,7 +19,7 @@ import {
 
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import usuario_schemas from "../schemas/usuarios.schemas.js";
+import usuario_schemas, { usuario_put_schemas } from "../schemas/usuarios.schemas.js";
 import contrasena_schemas from "../schemas/contrasena.schemas.js";
 import login_schemas from "../schemas/login.schemas.js";
 import registro_schemas from "../schemas/registro.schemas.js";
@@ -201,10 +201,23 @@ export const c_post_usuario = async (req, res, next) => {
 export const c_editar_usuario = async (req, res, next) => {
   try {
     const id = req.params.id;
-    const data = { ...req.body };
+    const es_propio = req.usuarios?.id === id;
+    const es_admin = req.usuarios?.rol === "superadmin" || req.usuarios?.rol === "administrador";
 
+    if (!es_propio && !es_admin) {
+      throwError(errors.usuario_protegido);
+    }
+
+    const data = { ...req.body };
+    const parseU = usuario_put_schemas.safeParse(data);
+    if (!parseU.success) {
+      return res.status(400).json({
+        error: parseU.error.issues[0]?.message || "Datos inválidos",
+        errors: parseU.error.issues,
+      });
+    }
     //--------------------------------------------------------------
-    if (Object.keys(data).length === 0) {
+    if (Object.keys(parseU.data).length === 0) {
       throwError(errors.campos_faltantes);
     }
 
@@ -438,12 +451,13 @@ export const olvido_contrasena = async (req, res, next) => {
     const token = jwt.sign({ id: user.id }, secret, { expiresIn: "1h" });
 
     const frontendUrl = process.env.FRONTEND_URL;
-    const resetUrl = `${frontendUrl}#/reset-password?token=${token}`;
+    const baseUrl = frontendUrl.endsWith('/') ? frontendUrl : `${frontendUrl}/`;
+    const resetUrl = `${baseUrl}#/reset-password?token=${token}`;
 
     // Configuración de Nodemailer
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT,
+      port: Number(process.env.SMTP_PORT) || 587,
       secure: process.env.SMTP_SECURE === "true",
       auth: {
         user: process.env.SMTP_USER,

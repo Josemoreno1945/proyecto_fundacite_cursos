@@ -7,6 +7,7 @@ import {
   c_get_menores_por_representante,
   c_get_menores_propios,
   c_get_menor_id,
+  c_get_menor_por_cedula,
   c_post_menor,
   c_put_menor,
   c_desactivar_menor,
@@ -16,6 +17,7 @@ import {
 import { verifyToken } from "../middlewares/auth.js";
 import { isAdmin } from "../middlewares/is_admin.js";
 import { permitir_roles } from "../middlewares/roles.js";
+import { evitar_duplicados } from "../middlewares/evitar_duplicados.js";
 
 const router = Router();
 
@@ -28,6 +30,7 @@ router.get("/f_nombre_menor", verifyToken, isAdmin, c_filtrar_nombre_menor);
 router.get("/menores", verifyToken, isAdmin, c_get_menores);
 router.get("/menores_activos", verifyToken, isAdmin, c_get_menores_activos);
 router.get("/menores_inactivos", verifyToken, isAdmin, c_get_menores_inactivos);
+router.get("/menor_por_cedula",verifyToken,isAdmin,c_get_menor_por_cedula);
 
 // Consulta de menores asignados al usuario en sesión (padre o representante institucional)
 router.get(
@@ -54,6 +57,7 @@ router.post(
   "/post_menor",
   verifyToken,
   permitir_roles("superadmin", "administrador", "representante", "representante_institucional"),
+  evitar_duplicados(2),
   c_post_menor
 );
 
@@ -68,7 +72,7 @@ router.put(
 
 //---------------------------------Estado (Activar / Desactivar)-------------------------
 
-router.put("/desactivar_menor/:id", verifyToken, isAdmin, c_desactivar_menor);
-router.put("/activar_menor/:id", verifyToken, isAdmin, c_activar_menor);
+router.put("/desactivar_menor/:id", verifyToken, isAdmin, evitar_duplicados(2), c_desactivar_menor);
+router.put("/activar_menor/:id", verifyToken, isAdmin, evitar_duplicados(2), c_activar_menor);
 
 export default router;

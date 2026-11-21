@@ -70,6 +70,16 @@ export const c_get_inscripciones_por_usuario = async (req, res, next) => {
       throwError(errors.campos_faltantes);
     }
 
+    const es_propio = req.usuarios?.id === usuario_id;
+    const es_admin_o_facilitador =
+      req.usuarios?.rol === "superadmin" ||
+      req.usuarios?.rol === "administrador" ||
+      req.usuarios?.rol === "facilitador";
+
+    if (!es_propio && !es_admin_o_facilitador) {
+      throwError(errors.usuario_protegido);
+    }
+
     const usuario = await get_usuario_id(usuario_id);
     if (!usuario) {
       throwError(errors.usuario_no_encontrado);

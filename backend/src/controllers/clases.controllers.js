@@ -264,9 +264,13 @@ export const c_put_clases = async (req, res, next) => {
     }
     delete parseC.data.taller_id;
 
+    if (Object.keys(parseC.data).length === 0) {
+      throwError(errors.campos_faltantes);
+    }
+
     //--------------------------------------------------------------
-    if (data.numero_clase) {
-      const numero_existe = await get_clase_por_numero(clase_actual.taller_id, data.numero_clase, id);
+      if (parseC.data.numero_clase) {
+      const numero_existe = await get_clase_por_numero(clase_actual.taller_id, parseC.data.numero_clase, id);
       if (numero_existe) {
         throwError(errors.clase_numero_duplicado);
       }

@@ -12,6 +12,7 @@ import {
 
 import { verifyToken } from "../middlewares/auth.js";
 import { isAdmin } from "../middlewares/is_admin.js";
+import { evitar_duplicados } from "../middlewares/evitar_duplicados.js";
 
 const router = Router();
 
@@ -30,8 +31,8 @@ router.get("/inscripciones_por_menor/:menor_id", verifyToken, c_get_inscripcione
 
 //---------------------------------POST / PUT---------------------------------
 
-router.post("/post_inscripcion", verifyToken, c_post_inscripcion);
-router.put("/cambiar_estado_inscripcion/:id", verifyToken, isAdmin, c_cambiar_estado_inscripcion);
+router.post("/post_inscripcion", verifyToken, evitar_duplicados(3), c_post_inscripcion);
+router.put("/cambiar_estado_inscripcion/:id", verifyToken, isAdmin, evitar_duplicados(2), c_cambiar_estado_inscripcion);
 
 export default router;
 

@@ -97,12 +97,12 @@ export const post_institucion = async (data) => {
     RETURNING *
   `;
   const values = [
-    data.nombre,
-    data.direccion,
-    data.parroquia_id,
-    data.tipo,
-    data.estado,
-  ];
+  data.nombre,
+  data.direccion ?? null,
+  data.parroquia_id,
+  data.tipo,
+  data.estado,
+];
   const result = await pool.query(query, values);
   return result.rows[0];
 };

@@ -185,19 +185,19 @@ export const post_usuario = async (data) => {
     `;
 
   const values = [
-    data.rol_id,
-    data.profesion_id,
-    data.nombre_usuario,
-    data.cedula,
-    data.primer_nombre,
-    data.primer_apellido,
-    data.sexo,
-    data.nivel_instruccion,
-    data.correo,
-    data.telefono,
-    data.contrasena,
-    data.estado,
-  ];
+  data.rol_id,
+  data.profesion_id ?? null,
+  data.nombre_usuario,
+  data.cedula,
+  data.primer_nombre,
+  data.primer_apellido,
+  data.sexo,
+  data.nivel_instruccion,
+  data.correo ?? null,
+  data.telefono ?? null,
+  data.contrasena,
+  data.estado,
+];
   const result = await pool.query(query, values);
   return result.rows[0];
 };

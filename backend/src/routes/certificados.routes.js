@@ -11,6 +11,7 @@ import {
 
 import { verifyToken } from "../middlewares/auth.js";
 import { isAdmin } from "../middlewares/is_admin.js";
+import { evitar_duplicados } from "../middlewares/evitar_duplicados.js";
 
 const router = Router();
 
@@ -30,7 +31,7 @@ router.get("/certificado_inscripcion/:inscripcion_id", verifyToken, c_get_certif
 
 //---------------------------------POST / PUT---------------------------------
 
-router.post("/post_certificado", verifyToken, isAdmin, c_post_certificado);
-router.put("/cambiar_estado_certificado/:id", verifyToken, isAdmin, c_cambiar_estado_certificado);
+router.post("/post_certificado", verifyToken, isAdmin, evitar_duplicados(2), c_post_certificado);
+router.put("/cambiar_estado_certificado/:id", verifyToken, isAdmin, evitar_duplicados(2), c_cambiar_estado_certificado);
 
 export default router;

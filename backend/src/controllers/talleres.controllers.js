@@ -11,7 +11,6 @@ import {
   filtro_dirigido_a_taller,
 } from "../models/talleres.models.js";
 
-import { pool } from "../db.js";
 import taller_schemas, { taller_editar_schemas } from "../schemas/talleres.schemas.js";
 import { errors, throwError } from "../utils/errors.js";
 import { send_success, success_messages } from "../utils/success.js";

@@ -87,10 +87,10 @@ export const post_rol = async (data) => {
   `;
 
   const values = [
-    data.nombre,
-    data.descripcion,
-    data.estado,
-  ];
+  data.nombre,
+  data.descripcion ?? null,
+  data.estado,
+];
   const result = await pool.query(query, values);
   return result.rows[0];
 };

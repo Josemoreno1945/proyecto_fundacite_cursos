@@ -11,6 +11,7 @@ import {
 
 import { verifyToken } from "../middlewares/auth.js";
 import { permitir_roles } from "../middlewares/roles.js";
+import { evitar_duplicados } from "../middlewares/evitar_duplicados.js";
 
 const router = Router();
 
@@ -30,8 +31,8 @@ router.get("/asistencia_clase_inscripcion/:clase_id/:inscripcion_id",verifyToken
 
 //---------------------------------POST / PUT---------------------------------
 
-router.post("/post_asistencia",verifyToken,permitir_roles("superadmin", "administrador", "facilitador"),c_post_asistencia);
+router.post("/post_asistencia",verifyToken,permitir_roles("superadmin", "administrador", "facilitador"),evitar_duplicados(2),c_post_asistencia);
 
-router.put("/editar_asistencia/:id",verifyToken,permitir_roles("superadmin", "administrador", "facilitador"),c_put_asistencia);
+router.put("/editar_asistencia/:id",verifyToken,permitir_roles("superadmin", "administrador", "facilitador"),evitar_duplicados(2),c_put_asistencia);
 
 export default router;

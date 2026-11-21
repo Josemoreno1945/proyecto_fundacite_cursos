@@ -383,13 +383,13 @@ CREATE UNIQUE INDEX "rol_permiso_unico" ON "rol_permisos" ("rol_id", "permiso_id
 -- No puede haber dos clases con el mismo número dentro del mismo taller
 CREATE UNIQUE INDEX "uq_clase_numero" ON "clases" ("taller_id", "numero_clase");
 
--- Un adulto no puede inscribirse dos veces al mismo taller
+-- Un adulto no puede tener dos inscripciones activas al mismo taller
 CREATE UNIQUE INDEX "uq_inscripcion_adulto" ON "inscripciones" ("taller_id", "usuario_id")
-  WHERE "menor_id" IS NULL;
+  WHERE "menor_id" IS NULL AND "estado" != 'cancelado';
 
--- Un menor no puede inscribirse dos veces al mismo taller
+-- Un menor no puede tener dos inscripciones activas al mismo taller
 CREATE UNIQUE INDEX "uq_inscripcion_menor" ON "inscripciones" ("taller_id", "menor_id")
-  WHERE "menor_id" IS NOT NULL;
+  WHERE "menor_id" IS NOT NULL AND "estado" != 'cancelado';
 
 -- Un inscripto solo puede tener un registro de asistencia por clase
 CREATE UNIQUE INDEX "uq_asistencia_por_clase" ON "asistencias" ("inscripcion_id", "clase_id");

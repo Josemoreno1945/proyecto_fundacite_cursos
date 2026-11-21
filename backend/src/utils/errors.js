@@ -294,5 +294,11 @@ export const errors = {
     status: 400,
     message: "Identificador inválido",
   },
+
+  // Control de tráfico y duplicados
+  peticion_duplicada: {
+    status: 429,
+    message: "Petición duplicada detectada. Por favor espera un momento antes de reintentar.",
+  },
 };
 
